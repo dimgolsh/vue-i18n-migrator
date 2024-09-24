@@ -1,6 +1,6 @@
 import traverse from '@babel/traverse';
 import * as t from '@babel/types';
-import { extractSetupParams, getProperty, getSetup } from '@/convert/utils';
+import { extractSetupParams, getProperty, getSetup } from './utils';
 import { ParseResult } from '@babel/parser';
 
 const findEmits = (ast: ParseResult<t.File>) => {

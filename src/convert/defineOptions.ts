@@ -1,6 +1,6 @@
 import * as t from '@babel/types';
 import { ObjectProperty } from '@babel/types';
-import { getProperty, wrapNewLineComment } from '@/convert/utils';
+import { getProperty, wrapNewLineComment } from './utils';
 
 export const getDefineOptions = (path: t.ObjectExpression) => {
 	const properties = path.properties;

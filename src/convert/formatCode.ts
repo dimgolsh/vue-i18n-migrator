@@ -1,5 +1,5 @@
-import prettier from 'prettier';
-import html from 'prettier/plugins/html';
+import * as prettier from 'prettier/standalone';
+import * as html from 'prettier/plugins/html';
 
 export const formatCode = async (rawVueCode: string) => {
 	const formattedCode = await prettier.format(rawVueCode, {

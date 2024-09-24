@@ -3,7 +3,7 @@
 import { Command } from 'commander';
 import { readFile, writeFile } from './utils';
 import { convert } from './convert';
-import chalk from 'chalk';
+// import chalk from 'chalk';
 
 const program = new Command();
 
@@ -19,11 +19,16 @@ program
 
 			if (converted) {
 				await writeFile(filepath, converted);
-				console.log(chalk.green(`✔ Successfully converted file: ${filepath}`));
+				console.log(`✔ Successfully converted file: ${filepath}`);
+				// console.log(chalk.green(`✔ Successfully converted file: ${filepath}`));
 			} else {
-				console.warn(chalk.yellow(`⚠ No changes made to file: ${filepath}`));
+				console.warn(`⚠ No changes made to file: ${filepath}`);
+				// console.warn(chalk.yellow(`⚠ No changes made to file: ${filepath}`));
 			}
 		} catch (error) {
-			console.error(chalk.red(`✖ Error converting file: ${(error as Error).message}`));
+			console.error(`✖ Error converting file: ${(error as Error).message}`);
+			// console.error(chalk.red(`✖ Error converting file: ${(error as Error).message}`));
 		}
 	});
+
+program.parse(process.argv);

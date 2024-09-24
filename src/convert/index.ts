@@ -3,14 +3,14 @@ import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import generate from '@babel/generator';
 import * as t from '@babel/types';
-import { getDefineComponent, parseVueFromContent, wrapNewLineComment } from '@/convert/utils';
-import { generateVue } from '@/convert/generateVue';
-import { formatCode } from '@/convert/formatCode';
-import { getDefineEmit } from '@/convert/defineEmits';
-import { getImports } from '@/convert/imports';
-import { getDefineOptions } from '@/convert/defineOptions';
-import { getDefineProps } from '@/convert/defineProps';
-import { getSetupContent } from '@/convert/setup';
+import { getDefineComponent, parseVueFromContent, wrapNewLineComment } from './utils';
+import { generateVue } from './generateVue';
+import { formatCode } from './formatCode';
+import { getDefineEmit } from './defineEmits';
+import { getImports } from './imports';
+import { getDefineOptions } from './defineOptions';
+import { getDefineProps } from './defineProps';
+import { getSetupContent } from './setup';
 
 export const convert = async (content: string) => {
 	try {
@@ -35,7 +35,6 @@ export const convert = async (content: string) => {
 
 		traverse(ast, {
 			ExportDefaultDeclaration(path) {
-				console.log(path)
 				pathNode = getDefineComponent(path);
 			},
 		});

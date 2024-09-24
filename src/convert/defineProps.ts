@@ -1,5 +1,5 @@
 import * as t from '@babel/types';
-import { extractSetupParams, getProperty, getSetup } from '@/convert/utils';
+import { extractSetupParams, getProperty, getSetup } from './utils';
 
 export const getDefineProps = (path: t.ObjectExpression) => {
 	const properties = path.properties;

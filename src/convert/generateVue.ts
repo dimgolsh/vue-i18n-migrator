@@ -1,5 +1,5 @@
 import { SFCDescriptor } from '@vue/compiler-sfc';
-import { newLine } from '@/convert/utils';
+import { newLine } from './utils';
 
 export const generateVue = (sfc: SFCDescriptor, code: string) => {
 	const codeFormat = code.trim().replaceAll(`\/\/${newLine}`, '');

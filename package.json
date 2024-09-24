@@ -3,12 +3,12 @@
   "license": "MIT",
   "private": true,
   "bin": {
-    "vue-comp-to-setup": "dist/cli.js"
+    "vue-comp-to-setup": "./bin/cli"
   },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:cli": "tsc -p tsconfig.compile.json",
+    "build:cli": "babel src --out-dir dist --extensions \".ts\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -23,6 +23,10 @@
     "monaco-editor": "^0.51.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.25.6",
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-typescript": "^7.24.7",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__traverse": "^7.20.6",
     "@types/chalk": "^2.2.0",
