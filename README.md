@@ -14,11 +14,12 @@ Features
 	•	Cleans up imports and adjusts the structure of your components.
 
 ## Usage
-The vue-comp-to-setup project has both CLI and API interface.
+The vue-comp-to-setup project has CLI
 
 ### CLI
 ```bash
 # npm
+# convert single vue file
 npx vue-comp-to-setup single [cliOptions] <vue file path>
 ```
 
@@ -26,6 +27,12 @@ npx vue-comp-to-setup single [cliOptions] <vue file path>
 ```
 -v, --view             Preview changes in the editor.
 -h, --help             Help for vue-comp-to-setup
+```
+
+```bash
+# npm
+# convert folder
+npx vue-comp-to-setup folder <folder dir path>
 ```
 
 ### License
