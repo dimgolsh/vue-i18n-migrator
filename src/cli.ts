@@ -1,34 +1,26 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { readFile, writeFile } from './utils';
-import { convert } from './convert';
-// import chalk from 'chalk';
+import { convertSingleFile } from './cli/convert-single';
+import { convertFolder } from './cli/convert-folder';
 
 const program = new Command();
 
 program.version('1.0.0').description('Vue Composition API to Script Setup Converter');
 
 program
-	.command('convert <filepath>')
+	.command('single <filepath>')
 	.description('Convert a single Vue file to script setup')
-	.action(async (filepath: string) => {
-		try {
-			const content = await readFile(filepath);
-			const converted = await convert(content); // Конвертация
+	.option('-v, --view', 'Preview changes in the editor')
+	.action((filepath: string, options: Record<string, any>) => {
+		convertSingleFile(filepath, options);
+	});
 
-			if (converted) {
-				await writeFile(filepath, converted);
-				console.log(`✔ Successfully converted file: ${filepath}`);
-				// console.log(chalk.green(`✔ Successfully converted file: ${filepath}`));
-			} else {
-				console.warn(`⚠ No changes made to file: ${filepath}`);
-				// console.warn(chalk.yellow(`⚠ No changes made to file: ${filepath}`));
-			}
-		} catch (error) {
-			console.error(`✖ Error converting file: ${(error as Error).message}`);
-			// console.error(chalk.red(`✖ Error converting file: ${(error as Error).message}`));
-		}
+program
+	.command('folder <filePath>')
+	.description('Convert folder vue files to script setup')
+	.action((filepath: string) => {
+		convertFolder(filepath);
 	});
 
 program.parse(process.argv);

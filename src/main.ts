@@ -1,7 +1,7 @@
 import './userWorker';
 
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import { convert } from '@/convert';
+import { convert } from './convert';
 // @ts-ignore
 import code from './demo.txt?raw';
 
@@ -18,7 +18,7 @@ const init = async () => {
 	const val = await convert(code);
 
 	const output = monaco.editor.create(document.getElementById('output'), {
-		value: val,
+		value: val.content,
 		language: 'html',
 		theme: 'vs-dark',
 	});
@@ -26,7 +26,7 @@ const init = async () => {
 	const setOutput = async () => {
 		try {
 			const val = await convert(editor.getValue());
-			output.setValue(val as string);
+			output.setValue(val.content as string);
 			// eslint-disable-next-line no-empty
 		} catch (error) {}
 	};

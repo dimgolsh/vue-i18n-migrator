@@ -12,18 +12,31 @@ import { getDefineOptions } from './defineOptions';
 import { getDefineProps } from './defineProps';
 import { getSetupContent } from './setup';
 
-export const convert = async (content: string) => {
+interface ConvertResult {
+	isOk: boolean;
+	content: string;
+	errors: string[];
+}
+
+export const convert = async (content: string): Promise<ConvertResult> => {
 	try {
 		const desc = parseVueFromContent(content);
 
 		if (desc.scriptSetup) {
-			console.warn('File is already setup');
-			return null;
+			return {
+				isOk: false,
+				content: '',
+				errors: ['File is already setup'],
+			};
 		}
 
 		if (desc.script.lang !== 'ts') {
 			console.warn('Vue file is not typescript');
-			return null;
+			return {
+				isOk: false,
+				content: '',
+				errors: ['Vue file is not typescript'],
+			};
 		}
 
 		const ast = parse(desc.script.content, {
@@ -62,10 +75,18 @@ export const convert = async (content: string) => {
 
 		const format = await formatCode(rawVue);
 
-		return format;
+		return {
+			isOk: true,
+			content: format,
+			errors: [],
+		};
 	} catch (e) {
 		console.log(e);
 		console.error('Failed to convert');
-		return null;
+		return {
+			isOk: false,
+			content: '',
+			errors: ['Failed to convert', e.toString()],
+		};
 	}
 };
