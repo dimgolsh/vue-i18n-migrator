@@ -1,0 +1,30 @@
+{
+  "name": "vue-composition-api-to-setup",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.25.6",
+    "@babel/parser": "^7.25.6",
+    "@babel/traverse": "^7.25.6",
+    "@babel/types": "^7.25.6",
+    "@vue/compiler-sfc": "^3.2.45",
+    "commander": "^12.1.0",
+    "klaw": "^4.0.1",
+    "monaco-editor": "^0.51.0"
+  },
+  "devDependencies": {
+    "@types/babel__generator": "^7.6.8",
+    "@types/babel__traverse": "^7.20.6",
+    "@types/commander": "^2.12.2",
+    "@types/klaw": "^3.0.3",
+    "@types/node": "^22.5.5",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.6",
+    "vite-plugin-node-polyfills": "^0.22.0"
+  }
+}

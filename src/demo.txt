@@ -1,0 +1,42 @@
+<template>
+	<div>
+		<HelloWorld />
+	</div>
+</template>
+
+<script lang="ts">
+	import { computed, defineComponent } from 'vue';
+	import i18n from './i18n';
+	import HelloWorld from './hello-world.vue';
+
+	export default defineComponent({
+		name: 'App',
+		i18n,
+		props: {
+		    modelValue: {type: Boolean, default: false}
+		},
+		emits: ['update'],
+		components: {
+			HelloWorld
+		},
+		setup(props, { emit }) {
+			const checked = ref(props.modelValue);
+
+			const update = (val: boolean) => {
+			    emit('update', val)
+			}
+
+			return {
+			    value
+			}
+		},
+	});
+</script>
+
+<style lang="less" scoped>
+	.app {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+</style>
