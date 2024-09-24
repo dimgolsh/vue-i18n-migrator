@@ -1,9 +1,14 @@
 {
-  "name": "vue-composition-api-to-setup",
+  "name": "vue-comp-to-setup",
+  "license": "MIT",
   "private": true,
+  "bin": {
+    "vue-comp-to-setup": "dist/cli.js"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:cli": "tsc -p tsconfig.compile.json",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -12,6 +17,7 @@
     "@babel/traverse": "^7.25.6",
     "@babel/types": "^7.25.6",
     "@vue/compiler-sfc": "^3.2.45",
+    "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "klaw": "^4.0.1",
     "monaco-editor": "^0.51.0"
@@ -19,6 +25,7 @@
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
     "@types/babel__traverse": "^7.20.6",
+    "@types/chalk": "^2.2.0",
     "@types/commander": "^2.12.2",
     "@types/klaw": "^3.0.3",
     "@types/node": "^22.5.5",

@@ -86,12 +86,6 @@ export const extractSetupParams = (node: t.ObjectMethod) => {
 	return result;
 };
 
-export const createNewLineNode = () => {
-	return t.expressionStatement(
-		t.stringLiteral('//Empty'), // Добавляем пустой комментарий, который интерпретируется как новая строка
-	);
-};
-
 export const wrapNewLineComment = (
 	node: t.VariableDeclaration | t.ExpressionStatement | t.Statement | t.BlockStatement,
 ) => {
