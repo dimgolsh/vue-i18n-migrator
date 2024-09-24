@@ -1,5 +1,5 @@
 {
-  "name": "@dimgolsh/vue-comp-to-setup",
+  "name": "vue-comp-to-setup",
   "version": "1.0.0",
   "keywords": [
     "script setup",
@@ -36,8 +36,8 @@
     "chalk": "^4.1.2",
     "cli-progress": "^3.12.0",
     "commander": "^12.1.0",
-    "klaw": "^4.0.1",
-    "monaco-editor": "^0.51.0"
+    "monaco-editor": "^0.51.0",
+    "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.6",
@@ -48,10 +48,8 @@
     "@types/babel__traverse": "^7.20.6",
     "@types/chalk": "^2.2.0",
     "@types/commander": "^2.12.2",
-    "@types/klaw": "^3.0.3",
     "@types/node": "^22.5.5",
     "gh-pages": "^6.1.1",
-    "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.6",
     "vite-plugin-node-polyfills": "^0.22.0"
