@@ -1,5 +1,8 @@
 # Vue Composition API to Setup (AST)
 
+![NPM License](https://img.shields.io/npm/l/vue-comp-to-setup)
+![NPM Version](https://img.shields.io/npm/v/vue-comp-to-setup)
+
 
 [Demo](https://dimgolsh.github.io/vue-comp-to-setup/)
 
