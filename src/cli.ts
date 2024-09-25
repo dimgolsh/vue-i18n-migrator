@@ -6,7 +6,11 @@ import { convertFolder } from './cli/convert-folder';
 
 const program = new Command();
 
-program.version('1.0.0').description('Vue Composition API to Script Setup Converter');
+program
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	.version((require('../package.json') as { version: string }).version)
+	.description('Vue Composition API to Script Setup Converter')
+	.usage('<command> [options]');
 
 program
 	.command('single <filepath>')
