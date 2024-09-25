@@ -35,7 +35,7 @@ export const convertFolder = async (folderPath: string) => {
 					await writeFile(filePath, format);
 				} else {
 					resultAll.err++;
-					errors.push(result.errors.join('\n'));
+					errors.push(`${filePath} - ${result.errors.join('\n')}`);
 				}
 			} catch (e) {
 				resultAll.err++;

@@ -33,7 +33,6 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 		}
 
 		if (desc.script.lang !== 'ts') {
-			console.warn('Vue file is not typescript');
 			return {
 				isOk: false,
 				content: '',
@@ -88,7 +87,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 		};
 	} catch (e) {
 		console.log(e);
-		console.error('Failed to convert');
+		console.error('\n Failed to convert \n');
 		return {
 			isOk: false,
 			content: '',
