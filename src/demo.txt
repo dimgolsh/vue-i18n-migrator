@@ -9,6 +9,12 @@
 	import i18n from './i18n';
 	import HelloWorld from './hello-world.vue';
 
+	const offsetsBySize = {
+    		'12': 4,
+    		'14': 8,
+    		'16': 12,
+    };
+
 	export default defineComponent({
 		name: 'App',
 		i18n,
@@ -17,7 +23,8 @@
 		},
 		emits: ['update'],
 		components: {
-			HelloWorld
+			HelloWorld,
+			AsyncHelloWorld: defineAsyncComponent(() => import('./hello-world.vue')),
 		},
 		setup(props, { emit }) {
 			const checked = ref(props.modelValue);
