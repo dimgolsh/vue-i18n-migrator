@@ -1,7 +1,12 @@
-import { findInDir } from '../utils';
-import { convertSingleFile } from './convert-single';
+import { findInDir, readFile, writeFile } from '../utils';
 import chalk from 'chalk';
 import cliProgress from 'cli-progress';
+import { convert } from '../convert';
+
+const convertFile = async (filePath: string) => {
+	const fileContent = await readFile(filePath);
+	return convert(fileContent);
+};
 
 export const convertFolder = async (folderPath: string) => {
 	try {
@@ -16,16 +21,19 @@ export const convertFolder = async (folderPath: string) => {
 		const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 		bar.start(files.length, 0);
 		const resultAll = { success: 0, err: 0 };
+		const errors: string[] = [];
 
 		for (const filePath of files) {
 			value++;
 			try {
-				const result = await convertSingleFile(filePath, null);
+				const result = await convertFile(filePath);
 
-				if (result) {
+				if (result.isOk) {
 					resultAll.success++;
+					await writeFile(filePath, result.content);
 				} else {
 					resultAll.err++;
+					errors.push(result.errors.join('\n'));
 				}
 			} catch (e) {
 				resultAll.err++;
@@ -34,9 +42,13 @@ export const convertFolder = async (folderPath: string) => {
 		}
 		bar.stop();
 		console.log(chalk.green('✔ Conversion completed.'));
-		console.log(chalk.green(`✔ Successfully converted ${resultAll.success} files`));
+		if (resultAll.success) {
+			console.log(chalk.green(`✔ Successfully converted ${resultAll.success} files`));
+		}
+
 		if (resultAll.err) {
 			console.log(chalk.yellow(`⚠ ${resultAll.err} files could not be converted`));
+			console.log(chalk.yellow(errors.join('\n')));
 		}
 	} catch (e) {
 		console.error(chalk.red(`✖ Error converting files in directory: ${(e as Error).message}`));

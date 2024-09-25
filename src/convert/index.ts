@@ -27,7 +27,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			return {
 				isOk: false,
 				content: '',
-				errors: ['File is already setup'],
+				errors: ['⚠ File is already setup'],
 			};
 		}
 
@@ -36,7 +36,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			return {
 				isOk: false,
 				content: '',
-				errors: ['Vue file is not typescript'],
+				errors: ['⚠ Vue file is not typescript'],
 			};
 		}
 
@@ -89,7 +89,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 		return {
 			isOk: false,
 			content: '',
-			errors: ['Failed to convert', e.toString()],
+			errors: ['⚠ Failed to convert', e.toString()],
 		};
 	}
 };
