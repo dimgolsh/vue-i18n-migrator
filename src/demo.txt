@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-	import { computed, defineComponent } from 'vue';
+	import { computed, defineComponent, defineAsyncComponent, ref } from 'vue';
 	import i18n from './i18n';
 	import HelloWorld from './hello-world.vue';
 

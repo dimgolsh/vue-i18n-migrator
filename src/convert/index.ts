@@ -12,6 +12,7 @@ import { getDefineOptions } from './defineOptions';
 import { getDefineProps } from './defineProps';
 import { getSetupContent } from './setup';
 import { getOtherNodes } from './other';
+import { getComponents } from './components';
 
 interface ConvertResult {
 	isOk: boolean;
@@ -57,6 +58,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 		const props = getDefineProps(pathNode);
 		const emits = getDefineEmit(pathNode, ast);
 		const setupContent = getSetupContent(pathNode);
+		const components = getComponents(pathNode);
 
 		const imports = getImports(ast);
 		const otherNodes = getOtherNodes(ast);
@@ -64,6 +66,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 		const body: t.Statement[] = [
 			...imports,
 			...otherNodes.map((n) => wrapNewLineComment(n)),
+			...components.map((n) => wrapNewLineComment(n)),
 			wrapNewLineComment(defineOptionsNode),
 			wrapNewLineComment(props),
 			wrapNewLineComment(emits),
