@@ -7,7 +7,6 @@ export const getComponents = (path: t.ObjectExpression): t.VariableDeclaration[]
 	const componentsProperty = getProperty(properties, 'components');
 	const nodes: t.VariableDeclaration[] = [];
 
-	console.log(componentsProperty);
 	if (!componentsProperty) {
 		return [];
 	}
