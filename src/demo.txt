@@ -15,6 +15,7 @@
     		'16': 12,
     };
 
+    /** The component is used to select user file(s) */
 	export default defineComponent({
 		name: 'App',
 		i18n,

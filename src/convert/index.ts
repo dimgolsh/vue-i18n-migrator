@@ -64,8 +64,8 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 
 		const body: t.Statement[] = [
 			...imports,
-			...otherNodes.map((n) => wrapNewLineComment(n)),
 			...components.map((n) => wrapNewLineComment(n)),
+			...otherNodes.map((n) => wrapNewLineComment(n)),
 			wrapNewLineComment(defineOptionsNode),
 			wrapNewLineComment(props),
 			wrapNewLineComment(emits),

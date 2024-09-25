@@ -11,6 +11,7 @@ const convertFile = async (filePath: string) => {
 
 export const convertFolder = async (folderPath: string) => {
 	try {
+		const start = performance.now();
 		const files = findInDir(folderPath);
 
 		if (files.length === 0) {
@@ -43,9 +44,13 @@ export const convertFolder = async (folderPath: string) => {
 			bar.update(value);
 		}
 		bar.stop();
-		console.log(chalk.green('✔ Conversion completed.'));
+
+		const stop = performance.now();
+		const inSeconds = (stop - start) / 1000;
+		const rounded = Number(inSeconds).toFixed(3);
+
 		if (resultAll.success) {
-			console.log(chalk.green(`✔ Successfully converted ${resultAll.success} files`));
+			console.log(chalk.green(`✔ Successfully converted ${resultAll.success} files in ${rounded}s.`));
 		}
 
 		if (resultAll.err) {
@@ -53,6 +58,6 @@ export const convertFolder = async (folderPath: string) => {
 			console.log(chalk.yellow(errors.join('\n')));
 		}
 	} catch (e) {
-		console.error(chalk.red(`✖ Error converting files in directory: ${(e as Error).message}`));
+		console.error(chalk.red(`✖ Error converting files in directory: ${(e as Error)?.message}`));
 	}
 };
