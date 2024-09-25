@@ -1,24 +1,18 @@
 import * as prettier from 'prettier/standalone';
 import * as html from 'prettier/plugins/html';
+import { defaultPrettierConfig } from '../config';
+import chalk from 'chalk';
 
 export const formatCode = async (rawVueCode: string) => {
-	const formattedCode = await prettier.format(rawVueCode, {
-		parser: 'vue',
-		plugins: [html],
-		// From config
-		singleQuote: true,
-		printWidth: 120,
-		useTabs: true,
-		endOfLine: 'crlf',
-		quoteProps: 'consistent',
-		bracketSpacing: true,
-		bracketSameLine: false,
-		trailingComma: 'all',
-		htmlWhitespaceSensitivity: 'strict',
-
-		vueIndentScriptAndStyle: true,
-		singleAttributePerLine: true,
-	});
-
-	return formattedCode;
+	try {
+		return await prettier.format(rawVueCode, {
+			parser: 'vue',
+			plugins: [html],
+			// From config
+			...defaultPrettierConfig,
+		});
+	} catch (e) {
+		console.log(chalk.red('✖ Error formatting file'));
+		return rawVueCode;
+	}
 };

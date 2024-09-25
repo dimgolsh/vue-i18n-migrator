@@ -1,6 +1,7 @@
 import { existsFileSync, getFullPath, isVueFile, readFile, writeFile } from '../utils';
 import chalk from 'chalk';
 import { convert } from '../convert';
+import { formatCode } from './format-code';
 
 export const convertSingleFile = async (filepath: string, options: Record<string, boolean>) => {
 	try {
@@ -23,7 +24,8 @@ export const convertSingleFile = async (filepath: string, options: Record<string
 			if (options?.view) {
 				console.log(content);
 			} else {
-				await writeFile(filepath, content);
+				const format = await formatCode(content, filepath);
+				await writeFile(filepath, format);
 				console.log(chalk.green(`✔ Successfully converted file: ${filepath}`));
 			}
 		} else {

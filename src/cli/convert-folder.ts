@@ -2,6 +2,7 @@ import { findInDir, readFile, writeFile } from '../utils';
 import chalk from 'chalk';
 import cliProgress from 'cli-progress';
 import { convert } from '../convert';
+import { formatCode } from './format-code';
 
 const convertFile = async (filePath: string) => {
 	const fileContent = await readFile(filePath);
@@ -30,7 +31,8 @@ export const convertFolder = async (folderPath: string) => {
 
 				if (result.isOk) {
 					resultAll.success++;
-					await writeFile(filePath, result.content);
+					const format = await formatCode(result.content, filePath);
+					await writeFile(filePath, format);
 				} else {
 					resultAll.err++;
 					errors.push(result.errors.join('\n'));
