@@ -51,8 +51,21 @@ export const getSetup = (properties: t.Node[] | t.Node) => {
 	if (!Array.isArray(properties)) return null;
 
 	for (const prop of properties) {
+		// setup() {}
 		if (t.isObjectMethod(prop) && t.isIdentifier(prop.key) && prop.key.name === 'setup') {
 			return prop;
+		}
+		// setup: () => {}
+		if (
+			t.isObjectProperty(prop) &&
+			t.isIdentifier(prop.key) &&
+			prop.key.name === 'setup' &&
+			t.isArrowFunctionExpression(prop.value)
+		) {
+			const value = prop.value;
+			if (t.isBlockStatement(value.body)) {
+				return t.objectMethod('method', t.identifier('setup'), value.params, value.body);
+			}
 		}
 	}
 
