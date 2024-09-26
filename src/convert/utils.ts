@@ -62,9 +62,16 @@ export const getSetup = (properties: t.Node[] | t.Node) => {
 export const extractSetupParams = (node: t.ObjectMethod) => {
 	const params = node.params;
 
-	const result: { props?: t.Identifier; emit?: t.ObjectProperty } = {
+	const result: {
+		props?: t.Identifier;
+		emit?: t.ObjectProperty;
+		slots?: t.ObjectProperty;
+		attrs?: t.ObjectProperty;
+	} = {
 		props: null,
 		emit: null,
+		slots: null,
+		attrs: null,
 	};
 
 	params.forEach((prop) => {
@@ -76,9 +83,17 @@ export const extractSetupParams = (node: t.ObjectMethod) => {
 
 		if (t.isObjectPattern(prop)) {
 			const emit = getProperty(prop.properties, 'emit');
+			const slots = getProperty(prop.properties, 'slots');
+			const attrs = getProperty(prop.properties, 'attrs');
 
 			if (emit) {
 				result.emit = emit;
+			}
+			if (slots) {
+				result.slots = slots;
+			}
+			if (attrs) {
+				result.attrs = attrs;
 			}
 		}
 	});

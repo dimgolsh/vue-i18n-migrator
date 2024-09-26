@@ -7,12 +7,14 @@ import { getDefineComponent, parseVueFromContent, wrapNewLineComment } from './u
 import { generateVue } from './generateVue';
 import { formatCode } from './formatCode';
 import { getDefineEmit } from './defineEmits';
-import { getImports } from './imports';
+import { addImport, getImports } from './imports';
 import { getDefineOptions } from './defineOptions';
 import { getDefineProps } from './defineProps';
 import { getSetupContent } from './setup';
 import { getOtherNodes } from './other';
 import { getComponents } from './components';
+import { getUseSlots } from './useSlots';
+import { getUseAttrs } from './useAttrs';
 
 interface ConvertResult {
 	isOk: boolean;
@@ -69,6 +71,16 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 
 		const imports = getImports(ast);
 		const otherNodes = getOtherNodes(ast);
+		const slots = getUseSlots(pathNode);
+		const attrs = getUseAttrs(pathNode);
+
+		if (slots) {
+			addImport(imports, { source: 'vue', specifier: 'useSlots' });
+		}
+
+		if (attrs) {
+			addImport(imports, { source: 'vue', specifier: 'useAttrs' });
+		}
 
 		const body: t.Statement[] = [
 			...imports,
@@ -77,6 +89,8 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			wrapNewLineComment(defineOptionsNode),
 			wrapNewLineComment(props),
 			wrapNewLineComment(emits),
+			wrapNewLineComment(slots),
+			wrapNewLineComment(attrs),
 			...setupContent.map((v) => wrapNewLineComment(v)),
 		].filter((n) => !!n);
 

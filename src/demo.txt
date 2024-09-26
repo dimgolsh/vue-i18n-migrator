@@ -27,7 +27,7 @@
 			HelloWorld,
 			AsyncHelloWorld: defineAsyncComponent(() => import('./hello-world.vue')),
 		},
-		setup(props, { emit }) {
+		setup(props, { emit, slots }) {
 			const checked = ref(props.modelValue);
 
 			const update = (val: boolean) => {
