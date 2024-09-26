@@ -6,7 +6,7 @@ export const generateVue = (sfc: SFCDescriptor, code: string) => {
 	const content = sfc.template?.content?.trim() ? `<template>${sfc.template.content.trim()}</template>` : '';
 	const rawCodeVue = `\n\n<script setup lang="ts">${codeFormat}</script>`;
 
-	const styles = `\n\n${sfc.styles.map((style) => `<style${style.scoped ? ' scoped' : ''} ${style.attrs?.lang ? `lang="${style.attrs.lang}"` : ''}>${style.content.trim()}</style>`).join('\n\t')}`;
+	const styles = `\n\n${sfc.styles.map((style) => `<style ${style.attrs?.lang ? `lang="${style.attrs.lang}" ${style.scoped ? ' scoped' : ''}` : ''}>${style.content.trim()}</style>`).join('\n\t')}`;
 
 	return content + rawCodeVue + styles;
 };
