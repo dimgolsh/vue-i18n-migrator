@@ -19,10 +19,12 @@
 	export default defineComponent({
 		name: 'App',
 		i18n,
+		inheritAttrs: false,
 		props: {
 		    modelValue: {type: Boolean, default: false}
 		},
 		emits: ['update'],
+		expose: ['update'],
 		components: {
 			HelloWorld,
 			AsyncHelloWorld: defineAsyncComponent(() => import('./hello-world.vue')),

@@ -1,13 +1,12 @@
 import * as t from '@babel/types';
 import { ObjectProperty } from '@babel/types';
-import { getProperty, wrapNewLineComment } from './utils';
+import { getProperty } from './utils';
 
 export const getDefineOptions = (path: t.ObjectExpression) => {
 	const properties = path.properties;
 	const options: ObjectProperty[] = [];
 
 	const nameProperty = getProperty(properties, 'name');
-	const i18nProperty = getProperty(properties, 'i18n');
 
 	if (nameProperty) {
 		options.push(
@@ -15,14 +14,17 @@ export const getDefineOptions = (path: t.ObjectExpression) => {
 		);
 	}
 
-	if (i18nProperty) {
-		options.push(t.objectProperty(t.identifier('i18n'), t.identifier('i18n'), false, true));
-	}
+	properties.forEach((node) => {
+		if (t.isObjectProperty(node) && t.isIdentifier(node.key)) {
+			const name = node.key.name;
+			if (!['name', 'components', 'props', 'setup', 'emits', 'expose'].includes(name)) {
+				options.push(node);
+			}
+		}
+	});
 
 	if (options.length) {
-		return wrapNewLineComment(
-			t.expressionStatement(t.callExpression(t.identifier('defineOptions'), [t.objectExpression(options)])),
-		);
+		return t.expressionStatement(t.callExpression(t.identifier('defineOptions'), [t.objectExpression(options)]));
 	}
 
 	return null;

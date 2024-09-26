@@ -15,6 +15,7 @@ import { getOtherNodes } from './other';
 import { getComponents } from './components';
 import { getUseSlots } from './useSlots';
 import { getUseAttrs } from './useAttrs';
+import { getDefineExpose } from './defineExpose';
 
 interface ConvertResult {
 	isOk: boolean;
@@ -73,6 +74,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 		const otherNodes = getOtherNodes(ast);
 		const slots = getUseSlots(pathNode);
 		const attrs = getUseAttrs(pathNode);
+		const expose = getDefineExpose(pathNode);
 
 		if (slots) {
 			addImport(imports, { source: 'vue', specifier: 'useSlots' });
@@ -89,6 +91,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			wrapNewLineComment(defineOptionsNode),
 			wrapNewLineComment(props),
 			wrapNewLineComment(emits),
+			wrapNewLineComment(expose),
 			wrapNewLineComment(slots),
 			wrapNewLineComment(attrs),
 			...setupContent.map((v) => wrapNewLineComment(v)),
