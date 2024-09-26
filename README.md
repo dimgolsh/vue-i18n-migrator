@@ -2,6 +2,8 @@
 
 ![NPM License](https://img.shields.io/npm/l/vue-comp-to-setup)
 ![NPM Version](https://img.shields.io/npm/v/vue-comp-to-setup)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/dimgolsh/vue-comp-to-setup/test.yml)
+
 
 
 [Demo](https://dimgolsh.github.io/vue-comp-to-setup/)
