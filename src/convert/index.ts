@@ -32,6 +32,14 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			};
 		}
 
+		if (!desc.script) {
+			return {
+				isOk: false,
+				content: '',
+				errors: ['⚠ Vue file is not contain script'],
+			};
+		}
+
 		if (desc.script.lang !== 'ts') {
 			return {
 				isOk: false,
