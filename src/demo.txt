@@ -37,7 +37,10 @@
 			}
 
 			return {
-			    value
+			    checked,
+			    isChecked: computed(() => checked.value),
+			    toggle: () => (checked.value = !checked.value),
+			    upd: update
 			}
 		},
 	});
