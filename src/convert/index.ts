@@ -91,10 +91,10 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			wrapNewLineComment(defineOptionsNode),
 			wrapNewLineComment(props),
 			wrapNewLineComment(emits),
-			wrapNewLineComment(expose),
 			wrapNewLineComment(slots),
 			wrapNewLineComment(attrs),
 			...setupContent.map((v) => wrapNewLineComment(v)),
+			wrapNewLineComment(expose),
 		].filter((n) => !!n);
 
 		const newAst = t.program(body);

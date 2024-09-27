@@ -1,4 +1,4 @@
-# Vue Composition API to Setup (AST)
+# Vue Composition API to setup (AST)
 
 ![NPM License](https://img.shields.io/npm/l/vue-comp-to-setup)
 ![NPM Version](https://img.shields.io/npm/v/vue-comp-to-setup)
@@ -11,12 +11,70 @@
 vue-comp-to-setup is a command-line tool designed to convert Vue files written using the Composition API into the more modern Script Setup syntax. This tool automates the transformation process, making your code cleaner, easier to maintain, 
 and aligned with the latest Vue.js best practices.
 
-Features
+## Features
 
-	•	Converts Composition API-based Vue files to Script Setup syntax.
-	•	Handles both single files and entire directories.
-	•	Automatically updates defineProps, defineEmits, and defineOptions.
-	•	Cleans up imports and adjusts the structure of your components.
+
+- [x] Convert Composition API-based Vue files to Script Setup syntax
+- [x] Handles both single files and entire directories
+- [x] Automatically updates defineProps, defineEmits, and defineOptions.
+- [x] Cleans up imports and adjusts the structure of your components.
+
+### Supported features
+- [x] `defineOptions`
+  - [x] Extract component name
+  - [x] Extract custom attributes (`...i18n,  inheritAttrs, ...customOptions`)
+- [x] `defineProps`
+  - [x] Add const if necessary (`const props = defineProps({...})`)
+- [x] `defineEmits`
+  - [x] Add const if necessary (`const emit = defineEmits([...])`)
+  - [x] Find emits if used in a setup function
+- [x] `defineExpose`
+- [x] `useAttrs` from `setup(_, { attrs })`
+- [x] `useSlots` from `setup(_, { slots })`
+- [ ] `useRuntimeConfig` from `setup(_, { runtimeConfig })`
+
+
+- [x] Extract components 
+```vue
+<script lang="ts">
+  import { defineAsyncComponent } from 'vue';
+  export default {
+    components: {
+      AsyncHelloWorld: defineAsyncComponent(() => import('./hello-world.vue'))
+    }
+  }
+</script>
+
+<script setup lang="ts">
+  import { defineAsyncComponent } from 'vue';
+	
+  const AsyncHelloWorld = defineAsyncComponent(() => import('./hello-world.vue'));
+</script>
+
+```
+
+- [x] Extract from return statement
+```vue
+<script lang="ts">
+  export default {
+    setup() {
+      return {
+        checked: () => {}
+      }
+    }
+  }
+</script>
+
+<script setup lang="ts">
+  const checked = () => {}
+</script>
+
+```
+
+## Requirements
+
+- [Node.js > 18](https://nodejs.org/en/)
+- Valid Vue file  written in Typescript (`.vue` extension)
 
 ## Usage
 The vue-comp-to-setup project has CLI
@@ -79,6 +137,9 @@ The tool performs the following steps:
 	4.	Rewrite Setup Content: Extracts the content inside the setup function and refactors it according to Script Setup syntax, removing return statements.
 	5.	Code Formatting: Automatically formats the converted code using Prettier.
 
+
+### Useful Links
+- https://lihautan.com/babel-ast-explorer/
 
 ### License
 

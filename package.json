@@ -1,6 +1,7 @@
 {
   "name": "vue-comp-to-setup",
-  "version": "1.0.15",
+  "version": "1.0.16",
+  "author": "Dmitriy (https://github.com/dimgolsh)",
   "keywords": [
     "script setup",
     "vue",
@@ -25,7 +26,7 @@
     "build:cli": "babel src --out-dir dist --extensions \".ts\" && tsc --emitDeclarationOnly -p tsconfig.compile.json",
     "preview": "vite preview",
     "deploy": "gh-pages -d demo-dist",
-    "publish": "npm build:cli && npm publish",
+    "publish": "npm run build:cli && npm publish",
     "test": "chmod +x dist/cli.js && vitest"
   },
   "dependencies": {

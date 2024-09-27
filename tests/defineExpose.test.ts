@@ -13,7 +13,7 @@ test('Add defineExpose to script setup', async () => {
 
 	const resultCode = `
 <script setup lang="ts">
-defineExpose(['update']);
+defineExpose({update});
 </script>`;
 
 	const { content } = await convert(code);
