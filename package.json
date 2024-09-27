@@ -18,7 +18,7 @@
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "bin": {
-    "vue-comp-to-setup": "./bin/cli"
+    "vue-comp-to-setup": "bin/cli"
   },
   "scripts": {
     "dev": "vite",
@@ -63,6 +63,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dimgolsh/vue-comp-to-setup.git"
+    "url": "git+https://github.com/dimgolsh/vue-comp-to-setup.git"
   }
 }
