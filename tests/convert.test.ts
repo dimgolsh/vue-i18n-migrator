@@ -2,8 +2,6 @@ import { test, expect } from 'vitest';
 import { convert } from '../src';
 import { clean } from './utils';
 
-
-
 test('convert Vue file to script setup', async () => {
 	const code = `
     <script lang="ts">
@@ -41,6 +39,27 @@ test('convert props to defineProps', async () => {
 
 	const resultCode = `
 <script setup lang="ts">
+withDefaults(defineProps<{modelValue: boolean;}>(), {modelValue: false});
+</script>`;
+
+	const { content } = await convert(code, { propsOptionsLike: false });
+
+	expect(clean(content)).toEqual(clean(resultCode));
+});
+
+test('convert props to defineProps with propsOptionsLike', async () => {
+	const code = `
+    <script lang="ts">
+      export default {
+        props: {
+          modelValue: { type: Boolean, default: false },
+        },
+      };
+    </script>
+  `;
+
+	const resultCode = `
+<script setup lang="ts">
 defineProps({
  modelValue: {
     type: Boolean,
@@ -49,11 +68,10 @@ defineProps({
 });
 </script>`;
 
-	const { content } = await convert(code);
+	const { content } = await convert(code, { propsOptionsLike: true });
 
 	expect(clean(content)).toEqual(clean(resultCode));
 });
-
 
 test('convert emits to defineEmits', async () => {
 	const code = `
@@ -73,11 +91,10 @@ test('convert emits to defineEmits', async () => {
 const emit = defineEmits(['update']);
 
 emit('update', true);
-</script>`
+</script>`;
 
 	expect(clean(content)).toEqual(clean(expectCode));
 });
-
 
 test('throws error for invalid Vue file', async () => {
 	const content = `<template><div>Hello</div></template>`;

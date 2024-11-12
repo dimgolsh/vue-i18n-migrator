@@ -25,6 +25,8 @@ and aligned with the latest Vue.js best practices.
   - [x] Extract custom attributes (`...i18n,  inheritAttrs, ...customOptions`)
 - [x] `defineProps`
   - [x] Add const if necessary (`const props = defineProps({...})`)
+  - [x] Convert with type declaration (`const props = withDefaults(defineProps<{...}>(), {...})`)
+  - [x] Support props options like (`const props = defineProps({...})`)
 - [x] `defineEmits`
   - [x] Add const if necessary (`const emit = defineEmits([...])`)
   - [x] Find emits if used in a setup function

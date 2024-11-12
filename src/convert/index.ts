@@ -9,22 +9,18 @@ import { formatCode } from './formatCode';
 import { getDefineEmit } from './defineEmits';
 import { addImport, getImports } from './imports';
 import { getDefineOptions } from './defineOptions';
-import { getDefineProps } from './defineProps';
+import { getDefineProps, getDefinePropsTypeLiteration } from './defineProps';
 import { getSetupContent } from './setup';
 import { getOtherNodes } from './other';
 import { getComponents } from './components';
 import { getUseSlots } from './useSlots';
 import { getUseAttrs } from './useAttrs';
 import { getDefineExpose } from './defineExpose';
+import { ConvertOptions, ConvertResult } from './types';
 
-interface ConvertResult {
-	isOk: boolean;
-	content: string;
-	errors: string[];
-}
-
-export const convert = async (content: string): Promise<ConvertResult> => {
+export const convert = async (content: string, options?: ConvertOptions): Promise<ConvertResult> => {
 	try {
+		const { propsOptionsLike = false } = options ?? {};
 		const desc = parseVueFromContent(content);
 
 		if (desc.scriptSetup) {
@@ -65,7 +61,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 		});
 
 		const defineOptionsNode = getDefineOptions(pathNode);
-		const props = getDefineProps(pathNode);
+		const props = propsOptionsLike ? getDefineProps(pathNode) : getDefinePropsTypeLiteration(pathNode);
 		const emits = getDefineEmit(pathNode, ast);
 		const setupContent = getSetupContent(pathNode);
 		const components = getComponents(pathNode);

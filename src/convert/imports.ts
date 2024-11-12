@@ -3,26 +3,30 @@ import { ParseResult } from '@babel/parser';
 import * as t from '@babel/types';
 
 export const getImports = (ast: ParseResult<t.File>) => {
-	const newImports: t.ImportDeclaration[] = [];
+	const excludesNamesImportSpecifier = ['defineComponent', 'PropType'];
 
+	// Remove excluded imports
 	traverse(ast, {
-		ImportDeclaration(path) {
-			const source = path.node.source.value;
-			if (source === 'vue') {
-				const filteredSpecifiers = path.node.specifiers.filter(
-					(specifier) => specifier.local.name !== 'defineComponent',
-				);
-
-				if (filteredSpecifiers.length > 0) {
-					newImports.push(t.importDeclaration(filteredSpecifiers, t.stringLiteral('vue')));
+		ImportSpecifier(node) {
+			if (t.isIdentifier(node.node.imported)) {
+				if (excludesNamesImportSpecifier.includes(node.node.imported.name)) {
+					node.remove();
 				}
-			} else {
-				newImports.push(path.node); // Сохраняем остальные импорты
 			}
 		},
 	});
 
-	return newImports;
+	traverse(ast, {
+		ImportDeclaration(node) {
+			if (node.node.specifiers.length === 0) {
+				node.remove();
+			}
+		},
+	});
+
+	const imports = ast.program.body.filter((n) => t.isImportDeclaration(n));
+
+	return imports;
 };
 
 export const addImport = (imports: t.ImportDeclaration[], value: { source: string; specifier: string }) => {

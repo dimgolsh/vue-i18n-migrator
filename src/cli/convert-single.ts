@@ -2,8 +2,9 @@ import { existsFileSync, getFullPath, isVueFile, readFile, writeFile } from '../
 import chalk from 'chalk';
 import { convert } from '../convert';
 import { formatCode } from './format-code';
+import { ConvertFileOptions } from '../convert/types';
 
-export const convertSingleFile = async (filepath: string, options: Record<string, boolean>) => {
+export const convertSingleFile = async (filepath: string, options: ConvertFileOptions) => {
 	try {
 		if (!isVueFile(filepath)) {
 			console.warn(chalk.yellow(`⚠ Not a Vue file: ${filepath}`));
@@ -16,12 +17,12 @@ export const convertSingleFile = async (filepath: string, options: Record<string
 			console.warn(chalk.yellow(`⚠ File not found: ${filepath}`));
 			return null;
 		}
-
+		const { view = false, propsOptionsLike = false } = options ?? {};
 		const fileContent = await readFile(filepath);
-		const { isOk, content, errors } = await convert(fileContent); // Конвертация
+		const { isOk, content, errors } = await convert(fileContent, { propsOptionsLike }); // Конвертация
 
 		if (isOk) {
-			if (options?.view) {
+			if (view) {
 				console.log(content);
 			} else {
 				const format = await formatCode(content, filepath);

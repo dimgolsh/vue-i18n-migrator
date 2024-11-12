@@ -21,7 +21,21 @@
 		i18n,
 		inheritAttrs: false,
 		props: {
-		    modelValue: {type: Boolean, default: false}
+		    disabled: Boolean,
+		    modelValue: {type: Boolean, default: false},
+		    count: {type: Number, default: 0},
+		    modelVal: {type: Boolean, required: false},
+		    options: {type: Array as PropType<Option[]>, default: () => []},
+		    icon: {
+            			type: String as PropType<IconNames>,
+            			required: true,
+            			default: null,
+            },
+		    view: {
+            	type: String as PropType<'light' | 'black'>,
+            	default: 'black',
+            	validator: (value: string) => ['light', 'black'].includes(value),
+            }
 		},
 		emits: ['update'],
 		expose: ['update'],

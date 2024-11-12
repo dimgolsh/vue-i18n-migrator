@@ -15,7 +15,10 @@ const init = async () => {
 		},
 	});
 
-	const val = await convert(code);
+	const options = {
+		propsOptionsLike: false,
+	};
+	const val = await convert(code, options);
 
 	const output = monaco.editor.create(document.getElementById('output'), {
 		value: val.content,
@@ -25,8 +28,13 @@ const init = async () => {
 
 	const setOutput = async () => {
 		try {
-			const val = await convert(editor.getValue());
-			output.setValue(val.content as string);
+			const val = await convert(editor.getValue(), options);
+			if (val.isOk) {
+				output.setValue(val.content as string);
+			} else {
+				output.setValue((val.content as string) + val.errors.join('\n'));
+			}
+
 			// eslint-disable-next-line no-empty
 		} catch (error) {}
 	};
@@ -37,6 +45,13 @@ const init = async () => {
 			.catch(() => {
 				console.error('');
 			});
+	});
+
+	const checkBox = document.getElementById('propsOptionsLike') as HTMLInputElement;
+
+	checkBox.addEventListener('change', (e) => {
+		options.propsOptionsLike = (e.target as HTMLInputElement).checked;
+		setOutput();
 	});
 };
 

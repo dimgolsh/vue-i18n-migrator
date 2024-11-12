@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import { convertSingleFile } from './cli/convert-single';
 import { convertFolder } from './cli/convert-folder';
+import { ConvertFileOptions } from './convert/types';
 
 const program = new Command();
 
@@ -16,15 +17,18 @@ program
 	.command('single <filepath>')
 	.description('Convert a single Vue file to script setup')
 	.option('-v, --view', 'Preview changes in the editor')
-	.action((filepath: string, options: Record<string, any>) => {
+	.option('--propsOptionsLike', 'Convert props to defineProps with propsOptionsLike')
+	.action((filepath: string, options: ConvertFileOptions) => {
 		convertSingleFile(filepath, options);
 	});
 
 program
 	.command('folder <filePath>')
 	.description('Convert folder vue files to script setup')
-	.action((filepath: string) => {
-		convertFolder(filepath);
+	.option('-v, --view', 'Preview changes in the editor')
+	.option('--propsOptionsLike', 'Convert props to defineProps with propsOptionsLike')
+	.action((filepath: string, options: ConvertFileOptions) => {
+		convertFolder(filepath, options);
 	});
 
 program.parse(process.argv);
