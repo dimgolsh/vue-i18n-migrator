@@ -12,6 +12,15 @@ export const parseVueFromContent = (content: string) => {
 	return descriptor;
 };
 
+export const isSFC = (content: string) => {
+	try {
+		parseVueFromContent(content);
+		return true;
+	} catch (e) {
+		return false;
+	}
+};
+
 export const getDefineComponent = (path: NodePath<t.ExportDefaultDeclaration>): t.ObjectExpression => {
 	// export default {
 	// 	name: 'MyComponent',

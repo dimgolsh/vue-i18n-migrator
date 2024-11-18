@@ -97,6 +97,39 @@ const convertProp = (prop: t.ObjectProperty) => {
 	return result;
 };
 
+export const getDefinePropsFromObjectExpression = (path: t.ObjectExpression) => {
+	if (!t.isObjectExpression(path)) {
+		return null;
+	}
+
+	const signature: t.TSPropertySignature[] = [];
+	const defaults: Map<string, t.Expression> = new Map();
+
+	for (const prop of path.properties) {
+		const result = convertProp(prop as t.ObjectProperty);
+		if (result?.signature) {
+			signature.push(result.signature);
+		}
+		if (result?.default) {
+			defaults.set(result.name, result.default);
+		}
+	}
+
+	const defineProps = t.callExpression(t.identifier('defineProps'), []);
+	defineProps.typeParameters = t.tsTypeParameterInstantiation([t.tsTypeLiteral(signature)]);
+
+	if (defaults.size === 0) {
+		return defineProps;
+	}
+	const properties: t.ObjectProperty[] = [];
+	[...defaults.entries()].forEach(([name, value]) => {
+		properties.push(t.objectProperty(t.identifier(name), value));
+	});
+
+	const expression = t.objectExpression(properties);
+	return t.callExpression(t.identifier('withDefaults'), [defineProps, expression]);
+};
+
 export const getDefinePropsTypeLiteration = (path: t.ObjectExpression) => {
 	const properties = path.properties;
 
@@ -106,38 +139,7 @@ export const getDefinePropsTypeLiteration = (path: t.ObjectExpression) => {
 		return null;
 	}
 
-	const signature: t.TSPropertySignature[] = [];
-	const defaults: Map<string, t.Expression> = new Map();
-
-	if (t.isObjectExpression(propsProperty.value)) {
-		for (const prop of propsProperty.value.properties) {
-			const result = convertProp(prop as t.ObjectProperty);
-			if (result?.signature) {
-				signature.push(result.signature);
-			}
-			if (result?.default) {
-				defaults.set(result.name, result.default);
-			}
-		}
-	}
-
-	const getDefineProps = () => {
-		const defineProps = t.callExpression(t.identifier('defineProps'), []);
-		defineProps.typeParameters = t.tsTypeParameterInstantiation([t.tsTypeLiteral(signature)]);
-
-		if (defaults.size === 0) {
-			return defineProps;
-		}
-		const properties: t.ObjectProperty[] = [];
-		[...defaults.entries()].forEach(([name, value]) => {
-			properties.push(t.objectProperty(t.identifier(name), value));
-		});
-
-		const expression = t.objectExpression(properties);
-		return t.callExpression(t.identifier('withDefaults'), [defineProps, expression]);
-	};
-
-	const defineProps = getDefineProps();
+	const defineProps = getDefinePropsFromObjectExpression(propsProperty.value as t.ObjectExpression);
 
 	const setup = getSetup(properties);
 	if (!setup) {

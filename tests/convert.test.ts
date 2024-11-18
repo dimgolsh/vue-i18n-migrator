@@ -39,7 +39,7 @@ test('convert props to defineProps', async () => {
 
 	const resultCode = `
 <script setup lang="ts">
-withDefaults(defineProps<{modelValue: boolean;}>(), {modelValue: false});
+withDefaults(defineProps<{modelValue?: boolean;}>(), {modelValue: false});
 </script>`;
 
 	const { content } = await convert(code, { propsOptionsLike: false });

@@ -1,0 +1,22 @@
+	const props = defineProps({
+		tooltipText: {
+			type: String,
+			default: '',
+		},
+		injectKey: {
+			type: String,
+			default: '',
+		},
+		disabled: {
+			type: Boolean,
+			default: false,
+		},
+		hideTooltip: {
+			type: Boolean,
+			default: false,
+		},
+		defaultPromptText: {
+			type: String,
+			default: '',
+		},
+	});
