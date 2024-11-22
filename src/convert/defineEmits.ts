@@ -21,12 +21,33 @@ const findEmits = (ast: ParseResult<t.File>) => {
 	return Array.from(emits);
 };
 
+const createEmitProperty = (name: string) => {
+	const ident = t.identifier('e');
+	ident.typeAnnotation = t.tsTypeAnnotation(t.tsLiteralType(t.stringLiteral(name)));
+	return t.tsCallSignatureDeclaration(null, [ident], t.tSTypeAnnotation(t.tsVoidKeyword()));
+};
+
+const convertEmits = (node: t.ArrayExpression) => {
+	const params: t.TSCallSignatureDeclaration[] = [];
+	const callExpression = t.callExpression(t.identifier('defineEmits'), []);
+
+	for (const el of node.elements) {
+		if (t.isStringLiteral(el)) {
+			params.push(createEmitProperty(el.value));
+		}
+	}
+	callExpression.typeParameters = t.tsTypeParameterInstantiation([t.tsTypeLiteral(params)]);
+
+	return callExpression;
+};
+
 export const getDefineEmit = (path: t.ObjectExpression, ast: ParseResult<t.File>) => {
 	const properties = path.properties;
 
 	const emitsProperty = getProperty(properties, 'emits');
+
 	if (emitsProperty) {
-		const callExpression = t.callExpression(t.identifier('defineEmits'), [emitsProperty.value as t.Expression]);
+		const callExpression = convertEmits(emitsProperty.value as t.ArrayExpression);
 
 		const setup = getSetup(properties);
 		if (!setup) {
@@ -46,10 +67,9 @@ export const getDefineEmit = (path: t.ObjectExpression, ast: ParseResult<t.File>
 		return null;
 	}
 
-	return t.variableDeclaration('const', [
-		t.variableDeclarator(
-			t.identifier('emit'),
-			t.callExpression(t.identifier('defineEmits'), [t.arrayExpression(emits.map((event) => t.stringLiteral(event)))]),
-		),
-	]);
+	const exp = t.arrayExpression(emits.map((event) => t.stringLiteral(event)));
+
+	const call = convertEmits(exp);
+
+	return t.variableDeclaration('const', [t.variableDeclarator(t.identifier('emit'), call)]);
 };
