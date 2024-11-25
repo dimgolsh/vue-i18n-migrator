@@ -6,7 +6,7 @@ import { convert } from './convert';
 import code from './demo.txt?raw';
 // @ts-ignore
 import codeProps from './demoProps.txt?raw';
-import { ConvertOptions } from './convert/types';
+import { BlockOrder, ConvertOptions } from './convert/types';
 import { definePropsToWithDefaults } from './convert/utils/definePropsToWithDefaults';
 
 let currentConverter = 'vue-comp-to-setup';
@@ -29,8 +29,9 @@ const init = async () => {
 		},
 	});
 
-	const options = {
+	const options: ConvertOptions = {
 		propsOptionsLike: false,
+		blockOrder: BlockOrder.SetupTemplateStyle,
 	};
 	const val = await convertWithCurrentConverter(code, options);
 
@@ -63,6 +64,7 @@ const init = async () => {
 
 	const checkBox = document.getElementById('propsOptionsLike') as HTMLInputElement;
 	const selectConverter = document.getElementById('selectConverter') as HTMLSelectElement;
+	const orderSelector = document.getElementById('blockOrder') as HTMLSelectElement;
 
 	selectConverter.addEventListener('change', (e) => {
 		const value = (e.target as HTMLSelectElement).value;
@@ -70,8 +72,15 @@ const init = async () => {
 
 		if (currentConverter === 'vue-defineProps-to-withDefaults') {
 			editor.setValue(codeProps);
+		} else {
+			editor.setValue(code);
 		}
-		console.log(value);
+		setOutput();
+	});
+
+	orderSelector.addEventListener('change', (e) => {
+		console.log((e.target as HTMLSelectElement).value);
+		options.blockOrder = (e.target as HTMLSelectElement).value as BlockOrder;
 		setOutput();
 	});
 

@@ -11,6 +11,7 @@ test('CLI convert single file', async () => {
 	await fs.writeFile(
 		filePath,
 		`
+		<template><div></div></template>
     <script lang="ts">
       export default {
         name: 'TestComponent',
@@ -31,7 +32,9 @@ test('CLI convert single file', async () => {
 defineOptions({
 name: 'TestComponent',
 });
-</script>`;
+</script>
+<template><div></div></template>
+`;
 
 	expect(clean(result)).toEqual(clean(expectedCode));
 

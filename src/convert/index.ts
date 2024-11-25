@@ -16,11 +16,11 @@ import { getComponents } from './components';
 import { getUseSlots } from './useSlots';
 import { getUseAttrs } from './useAttrs';
 import { getDefineExpose } from './defineExpose';
-import { ConvertOptions, ConvertResult } from './types';
+import { BlockOrder, ConvertOptions, ConvertResult } from './types';
 
 export const convert = async (content: string, options?: ConvertOptions): Promise<ConvertResult> => {
 	try {
-		const { propsOptionsLike = false } = options ?? {};
+		const { propsOptionsLike = false, blockOrder = BlockOrder.SetupTemplateStyle } = options ?? {};
 		const desc = parseVueFromContent(content);
 
 		if (desc.scriptSetup) {
@@ -97,7 +97,7 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 
 		const code = generate(newAst, { jsescOption: { quotes: 'single' } }).code;
 
-		const rawVue = generateVue(desc, code);
+		const rawVue = generateVue(desc, code, blockOrder);
 
 		const format = await formatCode(rawVue);
 

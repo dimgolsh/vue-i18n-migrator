@@ -4,12 +4,16 @@ export interface ConvertResult {
 	errors: string[];
 }
 
-
-export interface ConvertOptions {
-	propsOptionsLike: boolean
+export enum BlockOrder {
+	SetupTemplateStyle = 'SetupTemplateStyle',
+	TemplateSetupStyle = 'TemplateSetupStyle',
 }
 
+export interface ConvertOptions {
+	propsOptionsLike: boolean;
+	blockOrder?: BlockOrder;
+}
 
-export interface ConvertFileOptions extends ConvertOptions{
+export interface ConvertFileOptions extends ConvertOptions {
 	view: boolean;
 }
