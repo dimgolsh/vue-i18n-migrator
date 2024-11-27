@@ -10,7 +10,7 @@ test('convert defineProprs to definePropsWithDefaults', async () => {
 		default: '',
 	},
 	injectKey: {
-		type: String,
+		type: [String, Number],
 		default: '',
 	},
 	disabled: {
@@ -31,7 +31,7 @@ test('convert defineProprs to definePropsWithDefaults', async () => {
 	const resultCode = `
 const props = withDefaults(defineProps<{
    tooltipText?: string;
-   injectKey?: string;
+   injectKey?: string | number;
    disabled?: boolean;
    hideTooltip?: boolean;
    defaultPromptText?: string;

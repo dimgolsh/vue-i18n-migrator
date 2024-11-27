@@ -34,6 +34,16 @@ const convertIdentifier = (identifier: t.Identifier) => {
 	return t.tsTypeReference(t.identifier(name));
 };
 
+const transformArrayExp = (arr: t.ArrayExpression, name: string) => {
+	const tsTypes: t.TSType[] = [];
+	for (const of of arr.elements) {
+		if (t.isIdentifier(of)) {
+			tsTypes.push(convertIdentifier(of));
+		}
+	}
+	return createSignature(name, t.tsUnionType(tsTypes));
+};
+
 const convertProp = (prop: t.ObjectProperty) => {
 	if (!t.isObjectProperty(prop) || !t.isIdentifier(prop.key)) {
 		return null;
@@ -50,6 +60,12 @@ const convertProp = (prop: t.ObjectProperty) => {
 	// model: Boolean
 	if (t.isIdentifier(prop.value)) {
 		result.signature = createSignature(name, convertIdentifier(prop.value));
+		return result;
+	}
+
+	// model: [String, Number]
+	if (t.isArrayExpression(prop.value)) {
+		result.signature = transformArrayExp(prop.value, name);
 		return result;
 	}
 
@@ -79,6 +95,11 @@ const convertProp = (prop: t.ObjectProperty) => {
 					const params = property.value.typeAnnotation.typeParameters.params;
 					result.signature = createSignature(name, params[0]);
 				}
+			}
+
+			// model: { type: [String, Number], default: false }
+			if (t.isArrayExpression(property.value)) {
+				result.signature = transformArrayExp(property.value, name);
 			}
 		}
 

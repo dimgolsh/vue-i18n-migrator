@@ -22,7 +22,12 @@
 		inheritAttrs: false,
 		props: {
 		    disabled: Boolean,
+		    counter: [String, Number],
 		    modelValue: {type: Boolean, default: false},
+		    value: {
+            	    	type: [String, Number],
+                    	default: '',
+            },
 		    count: {type: Number, default: 0},
 		    modelVal: {type: Boolean, required: false},
 		    options: {type: Array as PropType<Option[]>, default: () => []},
