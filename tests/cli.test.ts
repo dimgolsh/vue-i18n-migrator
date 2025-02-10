@@ -43,6 +43,47 @@ name: 'TestComponent',
 	await fs.remove(outputPath);
 });
 
+test('Test rejects checkCompositionApi', async () => {
+	const filePath = path.resolve(__dirname, 'test.vue');
+
+	await fs.writeFile(
+		filePath,
+		`
+		<template><div></div></template>
+    <script lang="ts">
+      export default {
+        name: 'TestComponent',
+        setup() {
+          return {};
+        },
+      };
+    </script>
+  `,
+		'utf-8',
+	);
+
+	await expect(execa('./dist/cli.js', ['check-composition-api', filePath])).rejects.toThrow(
+		'Composition API is not supported',
+	);
+});
+
+test('Test checkCompositionApi', async () => {
+	const filePath = path.resolve(__dirname, 'test.vue');
+
+	await fs.writeFile(
+		filePath,
+		`
+		<template><div></div></template>
+    <script setup lang="ts">
+      
+    </script>
+  `,
+		'utf-8',
+	);
+
+	await expect(execa('./dist/cli.js', ['check-composition-api', filePath])).not.rejects;
+});
+
 test('CLI convert all files in folder', async () => {
 	const folderPath = path.resolve(__dirname, 'test-folder');
 	await fs.ensureDir(folderPath);
