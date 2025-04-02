@@ -18,6 +18,7 @@ and aligned with the latest Vue.js best practices.
 - [x] Handles both single files and entire directories
 - [x] Automatically updates defineProps, defineEmits, and defineOptions.
 - [x] Cleans up imports and adjusts the structure of your components.
+- [x] Convert props to style: options like, with defaults, reactivity
 
 ### Supported features
 - [x] `defineOptions`
@@ -26,6 +27,7 @@ and aligned with the latest Vue.js best practices.
 - [x] `defineProps`
   - [x] Add const if necessary (`const props = defineProps({...})`)
   - [x] Convert with type declaration (`const props = withDefaults(defineProps<{...}>(), {...})`)
+  - [x] Support props reactivity (`const {...} = defineProps<{...}>()`)
   - [x] Support props options like (`const props = defineProps({...})`)
 - [x] `defineEmits`
   - [x] Add const if necessary (`const emit = defineEmits([...])`)

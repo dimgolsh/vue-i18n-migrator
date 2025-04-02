@@ -9,18 +9,27 @@ import { formatCode } from './formatCode';
 import { getDefineEmit } from './defineEmits';
 import { addImport, getImports } from './imports';
 import { getDefineOptions } from './defineOptions';
-import { getDefineProps, getDefinePropsTypeLiteration } from './defineProps';
+import {
+	getDefineProps,
+	getDefinePropsTypeLiteration,
+	getReactivityProps,
+	replacePropsMemberExpression,
+} from './defineProps';
 import { getSetupContent } from './setup';
 import { getOtherNodes } from './other';
 import { getComponents } from './components';
 import { getUseSlots } from './useSlots';
 import { getUseAttrs } from './useAttrs';
 import { getDefineExpose } from './defineExpose';
-import { BlockOrder, ConvertOptions, ConvertResult } from './types';
+import { BlockOrder, ConvertOptions, ConvertResult, PropsStyle } from './types';
 
 export const convert = async (content: string, options?: ConvertOptions): Promise<ConvertResult> => {
 	try {
-		const { propsOptionsLike = false, blockOrder = BlockOrder.SetupTemplateStyle } = options ?? {};
+		const {
+			blockOrder = BlockOrder.SetupTemplateStyle,
+			propsStyle = PropsStyle.WithDefaults,
+			propsOptionsLike = false,
+		} = options ?? {};
 		const desc = parseVueFromContent(content);
 
 		if (desc.scriptSetup) {
@@ -61,7 +70,22 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 		});
 
 		const defineOptionsNode = getDefineOptions(pathNode);
-		const props = propsOptionsLike ? getDefineProps(pathNode) : getDefinePropsTypeLiteration(pathNode);
+		const props = (() => {
+			// @deprecated
+			if (propsOptionsLike) {
+				return getDefineProps(pathNode);
+			}
+
+			if (propsStyle === PropsStyle.ReactivityProps) {
+				return getReactivityProps(pathNode);
+			}
+
+			if (propsStyle === PropsStyle.WithDefaults) {
+				return getDefinePropsTypeLiteration(pathNode);
+			}
+
+			return getDefineProps(pathNode);
+		})();
 		const emits = getDefineEmit(pathNode, ast);
 		const setupContent = getSetupContent(pathNode);
 		const components = getComponents(pathNode);
@@ -78,6 +102,10 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 
 		if (attrs) {
 			addImport(imports, { source: 'vue', specifier: 'useAttrs' });
+		}
+
+		if (propsStyle === PropsStyle.ReactivityProps) {
+			replacePropsMemberExpression(ast);
 		}
 
 		const body: t.Statement[] = [

@@ -1,5 +1,7 @@
 import * as t from '@babel/types';
 import { extractSetupParams, getProperty, getSetup } from './utils';
+import traverse from '@babel/traverse';
+import { ParseResult } from '@babel/parser';
 
 interface ConvertResult {
 	name: string;
@@ -118,7 +120,7 @@ const convertProp = (prop: t.ObjectProperty) => {
 	return result;
 };
 
-export const getDefinePropsFromObjectExpression = (path: t.ObjectExpression) => {
+export const getDefinePropsWithSignature = (path: t.ObjectExpression) => {
 	if (!t.isObjectExpression(path)) {
 		return null;
 	}
@@ -139,13 +141,31 @@ export const getDefinePropsFromObjectExpression = (path: t.ObjectExpression) => 
 	const defineProps = t.callExpression(t.identifier('defineProps'), []);
 	defineProps.typeParameters = t.tsTypeParameterInstantiation([t.tsTypeLiteral(signature)]);
 
-	if (defaults.size === 0) {
-		return defineProps;
-	}
 	const properties: t.ObjectProperty[] = [];
 	[...defaults.entries()].forEach(([name, value]) => {
 		properties.push(t.objectProperty(t.identifier(name), value));
 	});
+
+	if (defaults.size === 0) {
+		return { defineProps, properties: [] };
+	}
+
+	return {
+		defineProps,
+		properties,
+	};
+};
+
+export const getDefinePropsFromObjectExpression = (path: t.ObjectExpression) => {
+	if (!t.isObjectExpression(path)) {
+		return null;
+	}
+
+	const { defineProps, properties } = getDefinePropsWithSignature(path);
+
+	if (properties.length === 0) {
+		return defineProps;
+	}
 
 	const expression = t.objectExpression(properties);
 	return t.callExpression(t.identifier('withDefaults'), [defineProps, expression]);
@@ -196,4 +216,50 @@ export const getDefineProps = (path: t.ObjectExpression) => {
 	}
 
 	return t.expressionStatement(callExpression);
+};
+
+// convertObjectProperty to assignmentPattern
+// convertObjectProperty(property: t.ObjectProperty) => t.ObjectProperty
+export const convertObjectProperty = (property: t.ObjectProperty) => {
+	return t.objectProperty(
+		property.key,
+		t.assignmentPattern(property.key as t.Identifier, property.value as t.Expression),
+	);
+};
+
+export const convertObjectPattern = (defineProps: t.CallExpression, properties: t.ObjectProperty[]) => {
+	const pattern = t.variableDeclarator(t.objectPattern(properties.map(convertObjectProperty)), defineProps);
+	return t.variableDeclaration('const', [pattern]);
+};
+
+export const getReactivityProps = (path: t.ObjectExpression) => {
+	const propsProperty = getProperty(path.properties, 'props');
+
+	if (!propsProperty) {
+		return null;
+	}
+
+	const { defineProps, properties } = getDefinePropsWithSignature(propsProperty.value as t.ObjectExpression);
+
+	const setup = getSetup(path.properties);
+	if (!setup) {
+		return t.expressionStatement(defineProps);
+	}
+
+	const { props } = extractSetupParams(setup);
+	if (props) {
+		return convertObjectPattern(defineProps, properties);
+	}
+
+	return t.expressionStatement(defineProps);
+};
+
+export const replacePropsMemberExpression = (ast: ParseResult<t.File>) => {
+	traverse(ast, {
+		MemberExpression(path) {
+			if (t.isIdentifier(path.node.object) && path.node.object.name === 'props') {
+				path.replaceWith(path.node.property);
+			}
+		},
+	});
 };
