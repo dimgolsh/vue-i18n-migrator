@@ -90,3 +90,89 @@ test('should add blank line between script and style', async () => {
 
 	expect(content).toEqual(expected);
 });
+
+
+test('should scoped styles must be properly maintained', async () => {
+	const code = `<script lang=ts>
+	export default defineComponent({
+		setup() {
+			return {
+				msg: 'Hello',
+			};
+		}
+	});
+</script>
+<style scoped>
+.msg { color: blue; }
+</style>`;
+
+	const expected = `<script setup lang="ts">\r\n	const msg = 'Hello';\r\n</script>\r\n\r\n<style scoped>\r\n	.msg { color: blue; }\r\n</style>\r\n`;
+
+	const { content } = await convert(code);
+
+	expect(content).toEqual(expected);
+});
+
+test('should non-scoped styles must be properly maintained', async () => {
+	const code = `<script lang=ts>
+	export default defineComponent({
+		setup() {
+			return {
+				msg: 'Hello',
+			};
+		}
+	});
+</script>
+<style>
+.msg { color: blue; }
+</style>`;
+
+	const expected = `<script setup lang="ts">\r\n	const msg = 'Hello';\r\n</script>\r\n\r\n<style>\r\n	.msg { color: blue; }\r\n</style>\r\n`;
+
+	const { content } = await convert(code);
+
+	expect(content).toEqual(expected);
+});
+
+
+test('should non-scoped lang styles must be properly maintained', async () => {
+	const code = `<script lang=ts>
+	export default defineComponent({
+		setup() {
+			return {
+				msg: 'Hello',
+			};
+		}
+	});
+</script>
+<style lang="scss">
+.msg { color: blue; }
+</style>`;
+
+	const expected = `<script setup lang="ts">\r\n	const msg = 'Hello';\r\n</script>\r\n\r\n<style lang="scss">\r\n	.msg { color: blue; }\r\n</style>\r\n`;
+
+	const { content } = await convert(code);
+
+	expect(content).toEqual(expected);
+});
+
+test('should scoped lang styles must be properly maintained', async () => {
+	const code = `<script lang=ts>
+	export default defineComponent({
+		setup() {
+			return {
+				msg: 'Hello',
+			};
+		}
+	});
+</script>
+<style lang="scss" scoped>
+.msg { color: blue; }
+</style>`;
+
+	const expected = `<script setup lang="ts">\r\n	const msg = 'Hello';\r\n</script>\r\n\r\n<style lang="scss" scoped>\r\n	.msg { color: blue; }\r\n</style>\r\n`;
+
+	const { content } = await convert(code);
+
+	expect(content).toEqual(expected);
+});
