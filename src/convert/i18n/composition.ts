@@ -18,7 +18,12 @@ export const convertCompositionI18n = (ast: ParseResult<t.File>, template: strin
 	// Process the block statement
 	processBlockStatement(ast, template);
 
-	const body: t.Statement[] = [...imports, ...ast.program.body.map(wrapNewLineComment)];
+	const newImports = [...imports, ...ast.program.body.filter((node) => t.isImportDeclaration(node))];
+
+	const body: t.Statement[] = [
+		...newImports,
+		...ast.program.body.filter((node) => !t.isImportDeclaration(node)).map(wrapNewLineComment),
+	];
 
 	return body;
 };
