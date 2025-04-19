@@ -1,0 +1,244 @@
+// Example 1: Basic script setup with i18n
+<script setup lang="ts">
+defineOptions({ name: 'BasicExample' });
+const { t } = useI18n();
+</script>
+
+<template>
+  <div>{{ $t('hello') }}</div>
+</template>
+
+// Example 2: Script setup with i18n and defineOptions containing i18n property
+<script setup lang="ts">
+defineOptions({
+  name: 'WithI18nOption',
+  i18n,
+});
+const { t } = useI18n();
+</script>
+
+<template>
+  <div>{{ $t('hello') }}</div>
+</template>
+
+// Example 3: Script setup with multiple i18n functions
+<script setup lang="ts">
+defineOptions({ name: 'MultipleI18n' });
+const { t, d, n } = useI18n();
+
+const date = new Date();
+const number = 42;
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('hello') }}</p>
+    <p>{{ $d(date, 'long') }}</p>
+    <p>{{ $n(number) }}</p>
+  </div>
+</template>
+
+// Example 4: Script setup with i18n in v-bind and v-on
+<script setup lang="ts">
+defineOptions({ name: 'DirectiveExample' });
+const { t } = useI18n();
+
+const handleClick = () => {
+  console.log(t('clicked'));
+};
+</script>
+
+<template>
+  <div>
+    <button :title="$t('tooltip')" @click="handleClick">
+      {{ $t('button') }}
+    </button>
+  </div>
+</template>
+
+// Example 5: Script setup with i18n and props/emits
+<script setup lang="ts">
+defineOptions({ name: 'PropsExample' });
+const { t } = useI18n();
+
+const props = defineProps<{
+  messageKey: string;
+}>();
+
+const emit = defineEmits<{
+  (e: 'update', value: string): void;
+}>();
+
+const translatedMessage = computed(() => t(props.messageKey));
+</script>
+
+<template>
+  <div>
+    <p>{{ translatedMessage }}</p>
+    <button @click="emit('update', $t('updated'))">
+      {{ $t('update') }}
+    </button>
+  </div>
+</template>
+
+// Example 6: Script setup with i18n and async data
+<script setup lang="ts">
+defineOptions({ name: 'AsyncExample' });
+const { t } = useI18n();
+
+const data = ref<string[]>([]);
+
+onMounted(async () => {
+  data.value = await fetchData();
+});
+</script>
+
+<template>
+  <div>
+    <h2>{{ $t('list.title') }}</h2>
+    <ul>
+      <li v-for="item in data" :key="item">
+        {{ $t('list.item', { value: item }) }}
+      </li>
+    </ul>
+  </div>
+</template>
+
+// Example 7: Script setup with i18n and composition functions
+<script setup lang="ts">
+defineOptions({ name: 'CompositionExample' });
+const { t } = useI18n();
+
+const { isLoading, error, data } = useAsyncData();
+const { user } = useUser();
+</script>
+
+<template>
+  <div>
+    <p v-if="isLoading">{{ $t('loading') }}</p>
+    <p v-else-if="error">{{ $t('error', { message: error }) }}</p>
+    <div v-else>
+      <h2>{{ $t('welcome', { name: user.name }) }}</h2>
+      <pre>{{ data }}</pre>
+    </div>
+  </div>
+</template>
+
+// Example 8: Script setup with only i18n in defineOptions (will be removed)
+<script setup lang="ts">
+defineOptions({
+  i18n
+});
+const { t } = useI18n();
+</script>
+
+<template>
+  <div>{{ $t('hello') }}</div>
+</template>
+
+// Example 9: Script setup with i18n and pluralization
+<script setup lang="ts">
+defineOptions({ name: 'PluralExample' });
+const { t, n } = useI18n();
+
+const count = ref(0);
+
+const increment = () => {
+  count.value++;
+};
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('items', count.value) }}</p>
+    <p>{{ $t('items_plural', { count: n(count.value) }) }}</p>
+    <button @click="increment">{{ $t('add') }}</button>
+  </div>
+</template>
+
+// Example 10: Script setup with i18n and nested translations
+<script setup lang="ts">
+defineOptions({ name: 'NestedExample' });
+const { t } = useI18n();
+
+const user = {
+  name: 'John',
+  role: 'admin'
+};
+</script>
+
+<template>
+  <div>
+    <h2>{{ $t('user.greeting', { name: user.name }) }}</h2>
+    <p>{{ $t(`user.role.${user.role}`) }}</p>
+    <p>{{ $t('user.permissions', { role: $t(`user.role.${user.role}`) }) }}</p>
+  </div>
+</template>
+
+// Example 11: Script setup with i18n and dynamic keys
+<script setup lang="ts">
+defineOptions({ name: 'DynamicExample' });
+const { t } = useI18n();
+
+const section = ref('home');
+const subsection = ref('welcome');
+</script>
+
+<template>
+  <div>
+    <h1>{{ $t(`${section.value}.${subsection.value}.title`) }}</h1>
+    <p>{{ $t(`${section.value}.${subsection.value}.description`) }}</p>
+  </div>
+</template>
+
+// Example 12: Script setup with i18n and number/currency formatting
+<script setup lang="ts">
+import i18n from './i18n';
+defineOptions({ name: 'FormattingExample' });
+const { t, n } = useI18n();
+
+const price = 42.99;
+const quantity = 1000;
+const date = new Date();
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('price', { value: n(price, 'currency') }) }}</p>
+    <p>{{ $t('quantity', { value: n(quantity, 'decimal') }) }}</p>
+    <p>{{ $d(date, 'long') }}</p>
+  </div>
+</template>
+
+
+// Example 13: 
+<template>
+	<div class="invitation-team">
+		<ScText
+			color="mulberry-purple"
+			size="14"
+		>
+			{{ $t('ToTeamDescription') }}
+		</ScText>
+	</div>
+</template>
+
+<script lang="ts">
+	import { defineComponent, ref } from 'vue';
+	import i18n from './i18n';
+
+
+	export default defineComponent({
+		name: 'InvitationTeam',
+		i18n,
+		components: {
+		},
+		setup() {
+			const { accountId } = useUser();
+			
+			return {
+				accountId
+			};
+		},
+	});
+</script>

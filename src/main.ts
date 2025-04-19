@@ -3,38 +3,72 @@ import './userWorker';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { convert } from './convert';
 // @ts-ignore
-import code from './demo.txt?raw';
-// @ts-ignore
-import codeProps from './demoProps.txt?raw';
-// @ts-ignore
-import codeWithDefaults from './demoWithDefaultsProps.txt?raw';
-import { BlockOrder, ConvertOptions, PropsStyle } from './convert/types';
-import { definePropsToWithDefaults } from './convert/utils/definePropsToWithDefaults';
-import { withDefaultsPropsToReactivityProps } from './convert/utils/withDefaultsPropsToReactivity';
+import defaultCode from './demo.txt?raw';
 
-enum Converter {
-	VueCompToSetup = 'vue-comp-to-setup',
-	VueDefinePropsToWithDefaults = 'vue-defineProps-to-withDefaults',
-	VueWithDefaultsPropsToReactivityProps = 'vue-withDefaults-props-to-reactivity-props',
-}
+const convertWithCurrentConverter = async (code: string) => {
+	return convert(code);
+};
 
-let currentConverter = Converter.VueCompToSetup;
+// Compress and save code to URL
+const saveToURL = (code: string) => {
+	const compressed = btoa(encodeURIComponent(code));
+	const url = new URL(window.location.href);
+	url.searchParams.set('code', compressed);
+	window.history.replaceState({}, '', url);
+};
 
-const convertWithCurrentConverter = async (code: string, options: ConvertOptions) => {
-	if (currentConverter === Converter.VueDefinePropsToWithDefaults) {
-		return definePropsToWithDefaults(code);
+// Get code from URL or return default
+const getCodeFromURL = (): string => {
+	const url = new URL(window.location.href);
+	const code = url.searchParams.get('code');
+	if (code) {
+		try {
+			return decodeURIComponent(atob(code));
+		} catch (e) {
+			console.error('Failed to decode URL code', e);
+			return defaultCode;
+		}
 	}
+	return defaultCode;
+};
 
-	if (currentConverter === Converter.VueWithDefaultsPropsToReactivityProps) {
-		return withDefaultsPropsToReactivityProps(code);
-	}
+// Create reset button
+const createResetButton = (editor: monaco.editor.IStandaloneCodeEditor) => {
+	const button = document.createElement('button');
+	button.textContent = 'Reset to Default';
+	button.style.position = 'absolute';
+	button.style.top = '10px';
+	button.style.right = '10px';
+	button.style.zIndex = '1000';
+	button.style.padding = '8px 16px';
+	button.style.backgroundColor = '#1e1e1e';
+	button.style.color = '#ffffff';
+	button.style.border = '1px solid #454545';
+	button.style.borderRadius = '4px';
+	button.style.cursor = 'pointer';
 
-	return convert(code, options);
+	button.addEventListener('mouseover', () => {
+		button.style.backgroundColor = '#2d2d2d';
+	});
+
+	button.addEventListener('mouseout', () => {
+		button.style.backgroundColor = '#1e1e1e';
+	});
+
+	button.addEventListener('click', () => {
+		editor.setValue(defaultCode);
+		// Clear URL query parameters
+		window.history.replaceState({}, '', window.location.pathname);
+	});
+
+	document.body.appendChild(button);
 };
 
 const init = async () => {
+	const initialCode = getCodeFromURL();
+
 	const editor = monaco.editor.create(document.getElementById('editor')!, {
-		value: code,
+		value: initialCode,
 		language: 'html',
 		theme: 'vs-dark',
 		minimap: {
@@ -42,12 +76,9 @@ const init = async () => {
 		},
 	});
 
-	const options: ConvertOptions = {
-		propsOptionsLike: false,
-		blockOrder: BlockOrder.SetupTemplateStyle,
-		propsStyle: PropsStyle.WithDefaults,
-	};
-	const val = await convertWithCurrentConverter(code, options);
+	createResetButton(editor);
+
+	const val = await convertWithCurrentConverter(initialCode);
 
 	const output = monaco.editor.create(document.getElementById('output'), {
 		value: val.content,
@@ -57,14 +88,15 @@ const init = async () => {
 
 	const setOutput = async () => {
 		try {
-			const val = await convertWithCurrentConverter(editor.getValue(), options);
+			const currentCode = editor.getValue();
+			saveToURL(currentCode);
+
+			const val = await convertWithCurrentConverter(currentCode);
 			if (val.isOk) {
 				output.setValue(val.content as string);
 			} else {
 				output.setValue((val.content as string) + val.errors.join('\n'));
 			}
-
-			// eslint-disable-next-line no-empty
 		} catch (error) {
 			console.error(error);
 		}
@@ -76,35 +108,6 @@ const init = async () => {
 			.catch(() => {
 				console.error('Error');
 			});
-	});
-
-	const selectConverter = document.getElementById('selectConverter') as HTMLSelectElement;
-	const orderSelector = document.getElementById('blockOrder') as HTMLSelectElement;
-	const propsStyleSelector = document.getElementById('propsStyle') as HTMLSelectElement;
-
-	selectConverter.addEventListener('change', (e) => {
-		const value = (e.target as HTMLSelectElement).value;
-		currentConverter = value as Converter;
-
-		if (currentConverter === Converter.VueDefinePropsToWithDefaults) {
-			editor.setValue(codeProps);
-		} else if (currentConverter === Converter.VueWithDefaultsPropsToReactivityProps) {
-			editor.setValue(codeWithDefaults);
-		} else {
-			editor.setValue(code);
-		}
-		setOutput();
-	});
-
-	orderSelector.addEventListener('change', (e) => {
-		console.log((e.target as HTMLSelectElement).value);
-		options.blockOrder = (e.target as HTMLSelectElement).value as BlockOrder;
-		setOutput();
-	});
-
-	propsStyleSelector.addEventListener('change', (e) => {
-		options.propsStyle = (e.target as HTMLSelectElement).value as PropsStyle;
-		setOutput();
 	});
 };
 

@@ -1,149 +1,126 @@
-# Vue Composition API to setup (AST)
+# Vue I18n Migrator
 
-![NPM License](https://img.shields.io/npm/l/vue-comp-to-setup)
-![NPM Version](https://img.shields.io/npm/v/vue-comp-to-setup)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/dimgolsh/vue-comp-to-setup/test.yml)
+![GitHub License](https://img.shields.io/github/license/dimgolsh/vue-i18n-migrator)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/dimgolsh/vue-i18n-migrator)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/dimgolsh/vue-i18n-migrator/test.yml)
 
+[Demo](https://dimgolsh.github.io/vue-i18n-migrator/)
 
+vue-i18n-migrator is a tool designed to help migrate Vue 2 i18n syntax to Vue 3 Composition API i18n syntax. Available both as a command-line tool and a web interface, it automates the transformation process, making your internationalization code cleaner and compatible with Vue 3.
 
-[Demo](https://dimgolsh.github.io/vue-comp-to-setup/)
+## Web Version Features
 
-vue-comp-to-setup is a command-line tool designed to convert Vue files written using the Composition API into the more modern Script Setup syntax. This tool automates the transformation process, making your code cleaner, easier to maintain, 
-and aligned with the latest Vue.js best practices.
+The web version provides an interactive interface for converting i18n code:
+- Real-time conversion preview
+- Code sharing via URL (your code is compressed and stored in the URL)
+- Reset to default example with one click
+- Syntax highlighting and error reporting
+- No server-side processing - all conversions happen in your browser
 
-## Features
+Try it out at [Demo](https://dimgolsh.github.io/vue-i18n-migrator/)
 
+## CLI Features
 
-- [x] Convert Composition API-based Vue files to Script Setup syntax
-- [x] Handles both single files and entire directories
-- [x] Automatically updates defineProps, defineEmits, and defineOptions.
-- [x] Cleans up imports and adjusts the structure of your components.
-- [x] Convert props to style: options like, with defaults, reactivity
+### Supported Transformations
 
-### Supported features
-- [x] `defineOptions`
-  - [x] Extract component name
-  - [x] Extract custom attributes (`...i18n,  inheritAttrs, ...customOptions`)
-- [x] `defineProps`
-  - [x] Add const if necessary (`const props = defineProps({...})`)
-  - [x] Convert with type declaration (`const props = withDefaults(defineProps<{...}>(), {...})`)
-  - [x] Support props reactivity (`const {...} = defineProps<{...}>()`)
-  - [x] Support props options like (`const props = defineProps({...})`)
-- [x] `defineEmits`
-  - [x] Add const if necessary (`const emit = defineEmits([...])`)
-  - [x] Find emits if used in a setup function
-- [x] `defineExpose`
-- [x] `useAttrs` from `setup(_, { attrs })`
-- [x] `useSlots` from `setup(_, { slots })`
-- [ ] `useRuntimeConfig` from `setup(_, { runtimeConfig })`
+- [x] Convert template syntax
+  - [x] `$t` to `t`
+  - [x] `$tc` to `t`
+  - [x] `$n` to `n`
+  - [x] `$d` to `d`
+  
+- [x] Convert script syntax
+  - [x] Add `useI18n` import
+  - [x] Remove i18n option from component
+  - [x] Add i18n composition function call
+  - [x] Handle existing i18n usage
 
+### Supported Contexts
 
-- [x] Extract components 
-```vue
-<script lang="ts">
-  import { defineAsyncComponent } from 'vue';
-  export default {
-    components: {
-      AsyncHelloWorld: defineAsyncComponent(() => import('./hello-world.vue'))
-    }
-  }
-</script>
-
-<script setup lang="ts">
-  import { defineAsyncComponent } from 'vue';
-	
-  const AsyncHelloWorld = defineAsyncComponent(() => import('./hello-world.vue'));
-</script>
-
-```
-
-- [x] Extract from return statement
-```vue
-<script lang="ts">
-  export default {
-    setup() {
-      return {
-        checked: () => {}
-      }
-    }
-  }
-</script>
-
-<script setup lang="ts">
-  const checked = () => {}
-</script>
-
-```
+- [x] Template interpolation (`{{ $t('key') }}` → `{{ t('key') }}`)
+- [x] Template attributes (`:title="$t('key')"` → `:title="t('key')"`)
+- [x] v-bind object syntax (`v-bind="{ title: $t('key') }"` → `v-bind="{ title: t('key') }"`)
+- [x] Dynamic components (`:is="$t('key')"` → `:is="t('key')"`)
+- [x] Regular attributes (`title="$t('key')"` → `title="t('key')"`)
 
 ## Requirements
 
-- [Node.js > 18](https://nodejs.org/en/)
-- Valid Vue file  written in Typescript (`.vue` extension)
+- Web version: Any modern browser
+- CLI version: [Node.js > 18](https://nodejs.org/en/)
+- Valid Vue file written in TypeScript (`.vue` extension)
 
 ## Usage
-The vue-comp-to-setup project has CLI
 
-Install locally or global
-```bash
-# npm
-npm i vue-comp-to-setup
-```
+### Web Interface
+
+1. Visit [Demo](https://dimgolsh.github.io/vue-i18n-migrator/)
+2. Paste your Vue 2 i18n code in the left editor
+3. See the converted Vue 3 i18n code in the right editor
+4. Share your code by copying the URL
+5. Use the "Reset to Default" button to return to the example code
 
 ### CLI
 
-#### Convert a Single File
+#### Install
 
-To convert a single .vue file, run:
 ```bash
 # npm
+npm i vue-i18n-migrator
+```
+
+#### Convert a Single File
+
+```bash
 # convert single vue file
-npx vue-comp-to-setup single [cliOptions] <vue file path>
+npx vue-i18n-migrator single [options] <vue file path>
 ```
 
 #### Options
 ```
--v, --view             Preview changes in the editor.
--h, --help             Help for vue-comp-to-setup
+-v, --view             Preview changes in the editor
+-h, --help             Help for vue-i18n-migrator
 ```
+
 Example:
 ```bash
-# npm
-# convert single vue file
-npx vue-comp-to-setup single "src/components/HelloWorld.vue"
+npx vue-i18n-migrator single "src/components/HelloWorld.vue"
 ```
 
-Example output
-```bash
-✔ Successfully converted file: src/components/HelloWorld.vue
-```
-
-### Convert All Files in a Directory
-
-To convert all .vue files in a specified directory, run:
+#### Convert All Files in a Directory
 
 ```bash
-# npm
 # convert folder
-npx vue-comp-to-setup folder <folder dir path>
+npx vue-i18n-migrator folder <folder dir path>
 ```
 
 ## How It Works
 
-Browser: Vue code -> Parser (SFC) -> @babel/parse AST -> Script Setup transform (@babel/traverse) -> Generate @babel/generator -> Format with Prettier standalone
+The tool operates in two modes:
 
-CLI: Read file -> Vue code -> Parser (SFC) -> @babel/parse AST -> Script Setup transform (@babel/traverse) -> Generate @babel/generator -> Format with Prettier standalone -> Format with Prettier API -> Write file
+### Browser Mode
+```
+Vue code -> Parser (SFC) -> @babel/parse AST -> I18n transform (@babel/traverse) -> 
+Generate @babel/generator -> Format with Prettier standalone
+```
+
+### CLI Mode
+```
+Read file -> Vue code -> Parser (SFC) -> @babel/parse AST -> I18n transform (@babel/traverse) -> 
+Generate @babel/generator -> Format with Prettier standalone -> Format with Prettier API -> Write file
+```
 
 The tool performs the following steps:
 
-	1.	Parse Vue Files: Reads the content of the Vue files and parse to AST with Babel.
-	2.	Convert to Script Setup: Extracts props, emits, and options (like component name and i18n) and converts them into Script Setup syntax (defineProps, defineEmits, defineOptions).
-	3.	Clean Up Imports: Removes unnecessary imports such as defineComponent and adjusts the remaining imports as needed.
-	4.	Rewrite Setup Content: Extracts the content inside the setup function and refactors it according to Script Setup syntax, removing return statements.
-	5.	Code Formatting: Automatically formats the converted code using Prettier.
-
+1. Parse Vue Files: Reads the content of the Vue files and parses to AST with Babel
+2. Detect I18n Usage: Analyzes the template and script for i18n function calls
+3. Transform Template: Converts template i18n syntax ($t, $tc, $n, $d) to composition API syntax
+4. Transform Script: Adds useI18n import and call, removes i18n option
+5. Code Formatting: Automatically formats the converted code using Prettier
 
 ### Useful Links
-- https://lihautan.com/babel-ast-explorer/
+- [Vue I18n Documentation](https://vue-i18n.intlify.dev/)
+- [Vue I18n Migration Guide](https://vue-i18n.intlify.dev/guide/migration/breaking.html)
+- [AST Explorer](https://astexplorer.net/)
 
 ### License
 

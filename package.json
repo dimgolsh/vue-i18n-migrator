@@ -1,13 +1,14 @@
 {
-  "name": "vue-comp-to-setup",
-  "version": "1.2.8",
+  "name": "vue-i18n-migrator",
+  "version": "1.0.1",
   "author": "Dmitriy (https://github.com/dimgolsh)",
   "keywords": [
     "script setup",
     "vue",
+    "i18n",
     "composition api"
   ],
-  "description": "Convert Vue files written using the Composition API into Script Setup syntax",
+  "description": "Convert Vue files with i18n to use new i18n syntax",
   "license": "MIT",
   "files": [
     "bin",
@@ -18,7 +19,7 @@
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "bin": {
-    "vue-comp-to-setup": "bin/cli"
+    "vue-i18n-migrator": "bin/cli"
   },
   "scripts": {
     "dev": "vite",
@@ -39,7 +40,7 @@
     "cli-progress": "^3.12.0",
     "commander": "^12.1.0",
     "monaco-editor": "^0.51.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.5.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.6",
@@ -63,6 +64,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dimgolsh/vue-comp-to-setup.git"
+    "url": "git+https://github.com/dimgolsh/vue-i18n-migrator.git"
   }
 }

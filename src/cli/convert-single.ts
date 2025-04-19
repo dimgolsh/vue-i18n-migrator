@@ -17,9 +17,9 @@ export const convertSingleFile = async (filepath: string, options: ConvertFileOp
 			console.warn(chalk.yellow(`⚠ File not found: ${filepath}`));
 			return null;
 		}
-		const { view = false, propsOptionsLike = false } = options ?? {};
+		const { view = false } = options ?? {};
 		const fileContent = await readFile(filepath);
-		const { isOk, content, errors } = await convert(fileContent, { propsOptionsLike }); // Конвертация
+		const { isOk, content, errors } = await convert(fileContent); // Конвертация
 
 		if (isOk) {
 			if (view) {

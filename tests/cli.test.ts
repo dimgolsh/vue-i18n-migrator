@@ -11,15 +11,18 @@ test('CLI convert single file', async () => {
 	await fs.writeFile(
 		filePath,
 		`
-		<template><div></div></template>
-    <script lang="ts">
-      export default {
-        name: 'TestComponent',
-        setup() {
-          return {};
-        },
-      };
-    </script>
+<script setup lang="ts">
+import i18n from './i18n';
+defineOptions({ name: 'DateComponent', i18n });
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('date') }}</p>
+    <p>{{ $d(date, 'long') }}</p>
+    <p>{{ $tc('items', count) }}</p>
+  </div>
+</template>
   `,
 		'utf-8',
 	);
@@ -29,11 +32,21 @@ test('CLI convert single file', async () => {
 	const result = fs.readFileSync(filePath, 'utf-8');
 
 	const expectedCode = `<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import i18n from './i18n';
 defineOptions({
-name: 'TestComponent',
+  name: 'DateComponent',
 });
+const { t, d } = useI18n(i18n);
 </script>
-<template><div></div></template>
+
+<template>
+  <div>
+    <p>{{ t('date') }}</p>
+    <p>{{ d(date, 'long') }}</p>
+    <p>{{ t('items', count) }}</p>
+  </div>
+</template>
 `;
 
 	expect(clean(result)).toEqual(clean(expectedCode));
@@ -43,45 +56,59 @@ name: 'TestComponent',
 	await fs.remove(outputPath);
 });
 
-test('Test rejects checkCompositionApi', async () => {
+test('Test rejects checkVueI18nFromContent', async () => {
 	const filePath = path.resolve(__dirname, 'test.vue');
 
 	await fs.writeFile(
 		filePath,
 		`
-		<template><div></div></template>
-    <script lang="ts">
-      export default {
-        name: 'TestComponent',
-        setup() {
-          return {};
-        },
-      };
-    </script>
+<script setup lang="ts">
+import i18n from './i18n';
+defineOptions({ name: 'DateComponent', i18n });
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('date') }}</p>
+    <p>{{ $d(date, 'long') }}</p>
+    <p>{{ $tc('items', count) }}</p>
+  </div>
+</template>
   `,
 		'utf-8',
 	);
 
-	await expect(execa('./dist/cli.js', ['check-composition-api', filePath])).rejects.toThrow(
-		'Composition API is not supported',
-	);
+	const { stdout } = await execa('./dist/cli.js', ['check-vue-i18n', filePath], {
+		reject: false
+	});
+
+	expect(stdout).toContain('⚠ Vue file template contain deprecated i18n usage');
+	expect(stdout).toContain('⚠ Vue file should has useI18n(i18n)');
 });
 
-test('Test checkCompositionApi', async () => {
+test('Test check-vue-i18n', async () => {
 	const filePath = path.resolve(__dirname, 'test.vue');
 
 	await fs.writeFile(
 		filePath,
 		`
-		<template><div></div></template>
-    <script setup lang="ts">
-      
-    </script>
+<script setup lang="ts">
+import i18n from './i18n';
+defineOptions({ name: 'DateComponent', i18n });
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('date') }}</p>
+    <p>{{ $d(date, 'long') }}</p>
+    <p>{{ $tc('items', count) }}</p>
+  </div>
+</template>
   `,
 		'utf-8',
 	);
 
-	await expect(execa('./dist/cli.js', ['check-composition-api', filePath])).not.rejects;
+	await expect(execa('./dist/cli.js', ['check-vue-i18n', filePath])).not.rejects;
 });
 
 test('CLI convert all files in folder', async () => {
@@ -91,28 +118,54 @@ test('CLI convert all files in folder', async () => {
 	await fs.writeFile(
 		path.join(folderPath, 'file1.vue'),
 		`
-    <script lang="ts">
-      export default {
-        name: 'TestComponent1',
-        setup() {
-          return {};
-        }
-      };
-    </script>
+<script setup lang="ts">
+import i18n from './i18n';
+defineOptions({ name: 'DateComponent', i18n });
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('date') }}</p>
+    <p>{{ $d(date, 'long') }}</p>
+    <p>{{ $tc('items', count) }}</p>
+  </div>
+</template>
   `,
 	);
 
 	await fs.writeFile(
 		path.join(folderPath, 'file2.vue'),
 		`
-    <script lang="ts">
-      export default {
-        name: 'TestComponent2',
-        setup() {
-          return {};
-        }
-      };
-    </script>
+<template>
+	<div class="invitation-team">
+		<ScText
+			color="mulberry-purple"
+			size="14"
+		>
+			{{ $t('ToTeamDescription') }}
+		</ScText>
+	</div>
+</template>
+
+<script lang="ts">
+	import { defineComponent, ref } from 'vue';
+	import i18n from './i18n';
+
+
+	export default defineComponent({
+		name: 'InvitationTeam',
+		i18n,
+		components: {
+		},
+		setup() {
+			const { accountId } = useUser();
+			
+			return {
+				accountId
+			};
+		},
+	});
+</script>
   `,
 	);
 
@@ -123,16 +176,55 @@ test('CLI convert all files in folder', async () => {
 	const result2 = await fs.readFile(path.join(folderPath, 'file2.vue'), 'utf-8');
 
 	const expectedCode1 = `<script setup lang="ts">
-defineOptions({
-name: 'TestComponent1',
-});
-</script>`;
+	import { useI18n } from 'vue-i18n';
+	import i18n from './i18n';
+	defineOptions({
+		name: 'DateComponent',
+	});
 
-	const expectedCode2 = `<script setup lang="ts">
-defineOptions({
-name: 'TestComponent2',
-});
-</script>`;
+	const { t, d } = useI18n(i18n);
+</script>
+
+<template>
+	<div>
+		<p>{{ t('date') }}</p>
+		<p>{{ d(date, 'long') }}</p>
+		<p>{{ t('items', count) }}</p>
+	</div>
+</template>
+`;
+
+	const expectedCode2 = `<template>
+	<div class="invitation-team">
+		<ScText
+			color="mulberry-purple"
+			size="14"
+		>
+			{{ t('ToTeamDescription') }}
+		</ScText>
+	</div>
+</template>
+
+<script lang="ts">
+	import { useI18n } from 'vue-i18n';
+	import { defineComponent, ref } from 'vue';
+	import i18n from './i18n';
+	export default defineComponent({
+		name: 'InvitationTeam',
+		components: {},
+		setup() {
+			const { accountId } = useUser();
+
+			const { t } = useI18n(i18n);
+
+			return {
+				accountId,
+				t,
+			};
+		},
+	});
+</script>
+`;
 
 	expect(clean(result1)).toEqual(clean(expectedCode1));
 	expect(clean(result2)).toEqual(clean(expectedCode2));

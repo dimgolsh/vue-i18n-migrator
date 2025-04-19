@@ -1,74 +1,30 @@
 <template>
-	<div>
-		<HelloWorld />
+	<div class="invitation-team">
+		<ScText
+			color="mulberry-purple"
+			size="14"
+		>
+			{{ $t('ToTeamDescription') }}
+		</ScText>
 	</div>
 </template>
 
 <script lang="ts">
-	import { computed, defineComponent, defineAsyncComponent, ref } from 'vue';
+	import { defineComponent, ref } from 'vue';
 	import i18n from './i18n';
-	import HelloWorld from './hello-world.vue';
 
-	const offsetsBySize = {
-    		'12': 4,
-    		'14': 8,
-    		'16': 12,
-    };
 
-    /** The component is used to select user file(s) */
 	export default defineComponent({
-		name: 'App',
+		name: 'InvitationTeam',
 		i18n,
-		inheritAttrs: false,
-		props: {
-		    disabled: Boolean,
-		    counter: [String, Number],
-		    modelValue: {type: Boolean, default: false},
-		    value: {
-            	    	type: [String, Number],
-                    	default: '',
-            },
-		    count: {type: Number, default: 0},
-		    modelVal: {type: Boolean, required: false},
-		    options: {type: Array as PropType<Option[]>, default: () => []},
-		    icon: {
-            			type: String as PropType<IconNames>,
-            			required: true,
-            			default: null,
-            },
-		    view: {
-            	type: String as PropType<'light' | 'black'>,
-            	default: 'black',
-            	validator: (value: string) => ['light', 'black'].includes(value),
-            }
-		},
-		emits: ['update'],
-		expose: ['update'],
 		components: {
-			HelloWorld,
-			AsyncHelloWorld: defineAsyncComponent(() => import('./hello-world.vue')),
 		},
-		setup(props, { emit, slots }) {
-			const checked = ref(props.modelValue);
-
-			const update = (val: boolean) => {
-			    emit('update', val)
-			}
-
+		setup() {
+			const { accountId } = useUser();
+			
 			return {
-			    checked,
-			    isChecked: computed(() => checked.value),
-			    toggle: () => (checked.value = !checked.value),
-			    upd: update
-			}
+				accountId
+			};
 		},
 	});
 </script>
-
-<style lang="less" scoped>
-	.app {
-		position: relative;
-		width: 100%;
-		height: 100%;
-	}
-</style>
