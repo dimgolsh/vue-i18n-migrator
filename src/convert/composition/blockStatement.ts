@@ -53,7 +53,7 @@ export const processBlockStatement = (ast: t.Node, template: string, replace: bo
 				if (resultUseI18n.useI18nCall) {
 					path.replaceWith(
 						t.blockStatement([
-							...body,
+							...body.map(wrapNewLineComment),
 							wrapNewLineComment(resultUseI18n.useI18nCall),
 							wrapNewLineComment(returnStatement),
 						]),
@@ -62,7 +62,7 @@ export const processBlockStatement = (ast: t.Node, template: string, replace: bo
 				}
 
 				if (!resultUseI18n.useI18nCall && resultUseI18n.args.length > 0) {
-					path.replaceWith(t.blockStatement([...body, wrapNewLineComment(returnStatement)]));
+					path.replaceWith(t.blockStatement([...body.map(wrapNewLineComment), wrapNewLineComment(returnStatement)]));
 					path.skip();
 				}
 			} else {
