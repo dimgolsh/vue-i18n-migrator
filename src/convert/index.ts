@@ -5,11 +5,11 @@ import { parseVueFromContent } from './utils';
 import { generateVue } from './generateVue';
 import { formatCode } from './formatCode';
 import { convertSetupI18n } from './i18n/setup';
-import { BlockOrder, ConvertResult } from './types';
+import { BlockOrder, ConvertResult, ConvertOptions } from './types';
 import { convertCompositionI18n } from './i18n/composition';
 import { validateFileOnCorrect } from './validateFile';
 
-export const convert = async (content: string): Promise<ConvertResult> => {
+export const convert = async (content: string, options?: ConvertOptions): Promise<ConvertResult> => {
 	try {
 		const desc = parseVueFromContent(content);
 
@@ -30,7 +30,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			plugins: ['typescript'],
 		});
 
-		const errors = validateFileOnCorrect(ast, templateContent, !isScriptSetup);
+		const errors = validateFileOnCorrect(ast, templateContent, !isScriptSetup, options);
 
 		if (errors.length === 0) {
 			return {
@@ -40,7 +40,7 @@ export const convert = async (content: string): Promise<ConvertResult> => {
 			};
 		}
 
-		const body = isScriptSetup ? convertSetupI18n(ast, templateContent) : convertCompositionI18n(ast, templateContent);
+		const body = isScriptSetup ? convertSetupI18n(ast, templateContent, options) : convertCompositionI18n(ast, templateContent, options);
 
 		// Create a new AST with the converted code
 		const newAst = t.program(body);

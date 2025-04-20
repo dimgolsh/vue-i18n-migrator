@@ -127,5 +127,147 @@ const { t } = useI18n(i18n);
 			const comparison = await compareCode(expected, result.content);
 			expect(comparison.normalizedExpected).toBe(comparison.normalizedActual);
 		});
+
+		it('should handle i18n-t usage', async () => {
+			const input = `
+<script setup lang="ts">
+	import PopupTemplate from './template.vue';
+	import i18n from '../i18n';
+
+	defineOptions({
+		i18n,
+	});
+
+	defineProps<{
+		orderName: string;
+		clientName: string;
+	}>();
+</script>
+<template>
+	<PopupTemplate>
+	
+		<template #description>
+			<i18n-t keypath="OrderCanceledByClientDescription">
+				<template #orderName>
+					<b>{{ orderName }}</b>
+				</template>
+				<template #clientName>
+					{{ clientName }}
+				</template>
+			</i18n-t>
+		</template>
+	</PopupTemplate>
+</template>
+`;
+
+			const expected = `
+<script setup lang="ts">
+	import { useI18n } from 'vue-i18n';
+	import PopupTemplate from './template.vue';
+	import i18n from '../i18n';
+
+  defineOptions({
+    i18n,
+  });
+
+	defineProps<{
+		orderName: string;
+		clientName: string;
+	}>();
+
+	useI18n(i18n);
+</script>
+
+<template>
+	<PopupTemplate>
+		<template #description>
+			<i18n-t keypath="OrderCanceledByClientDescription">
+				<template #orderName>
+					<b>{{ orderName }}</b>
+				</template>
+				<template #clientName>
+					{{ clientName }}
+				</template>
+			</i18n-t>
+		</template>
+	</PopupTemplate>
+</template>
+`;
+
+			const result = await convert(input);
+			expect(result.isOk).toBe(true);
+
+			const comparison = await compareCode(expected, result.content);
+			expect(comparison.normalizedExpected).toBe(comparison.normalizedActual);
+		});
+
+		it('should handle i18n-t usage with legacy off', async () => {
+			const input = `
+<script setup lang="ts">
+	import PopupTemplate from './template.vue';
+	import i18n from '../i18n';
+
+	defineOptions({
+		i18n,
+	});
+
+	defineProps<{
+		orderName: string;
+		clientName: string;
+	}>();
+</script>
+<template>
+	<PopupTemplate>
+	
+		<template #description>
+			<i18n-t keypath="OrderCanceledByClientDescription">
+				<template #orderName>
+					<b>{{ orderName }}</b>
+				</template>
+				<template #clientName>
+					{{ clientName }}
+				</template>
+			</i18n-t>
+		</template>
+	</PopupTemplate>
+</template>
+`;
+
+			const expected = `
+<script setup lang="ts">
+	import { useI18n } from 'vue-i18n';
+	import PopupTemplate from './template.vue';
+	import i18n from '../i18n';
+
+	defineProps<{
+		orderName: string;
+		clientName: string;
+	}>();
+
+	useI18n(i18n);
+</script>
+
+<template>
+	<PopupTemplate>
+		<template #description>
+			<i18n-t keypath="OrderCanceledByClientDescription">
+				<template #orderName>
+					<b>{{ orderName }}</b>
+				</template>
+				<template #clientName>
+					{{ clientName }}
+				</template>
+			</i18n-t>
+		</template>
+	</PopupTemplate>
+</template>
+`;
+
+			const result = await convert(input, { legacy: false });
+			expect(result.isOk).toBe(true);
+
+			const comparison = await compareCode(expected, result.content);
+			expect(comparison.normalizedExpected).toBe(comparison.normalizedActual);
+		});
 	});
 });

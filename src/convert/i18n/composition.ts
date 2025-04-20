@@ -4,8 +4,13 @@ import { importsCheck } from '../imports';
 import { convertDefineComponent } from '../composition/defineComponent';
 import { processBlockStatement } from '../composition/blockStatement';
 import { wrapNewLineComment } from '../utils';
+import { ConvertOptions } from '../types';
 
-export const convertCompositionI18n = (ast: ParseResult<t.File>, template: string): t.Statement[] => {
+export const convertCompositionI18n = (
+	ast: ParseResult<t.File>,
+	template: string,
+	options?: ConvertOptions,
+): t.Statement[] => {
 	// let setupContent: t.Statement[] = [];
 	const imports: t.ImportDeclaration[] = [];
 
@@ -13,7 +18,7 @@ export const convertCompositionI18n = (ast: ParseResult<t.File>, template: strin
 	importsCheck(ast, imports);
 
 	// Remove i18n from defineComponent
-	convertDefineComponent(ast);
+	convertDefineComponent(ast, template, true, options);
 
 	// Process the block statement
 	processBlockStatement(ast, template);

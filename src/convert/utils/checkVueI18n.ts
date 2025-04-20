@@ -1,9 +1,9 @@
-import { ConvertResult } from '../types';
+import { ConvertOptions, ConvertResult } from '../types';
 import { parseVueFromContent } from '../utils';
 import { validateFileOnCorrect } from '../validateFile';
 import { parse } from '@babel/parser';
 
-export const checkVueI18nFromContent = async (content: string): Promise<ConvertResult> => {
+export const checkVueI18nFromContent = async (content: string, options?: ConvertOptions): Promise<ConvertResult> => {
 	const desc = parseVueFromContent(content);
 
 	if (!desc.script && !desc.scriptSetup) {
@@ -23,7 +23,7 @@ export const checkVueI18nFromContent = async (content: string): Promise<ConvertR
 		plugins: ['typescript'],
 	});
 
-	const errors = validateFileOnCorrect(ast, templateContent, !isScriptSetup);
+	const errors = validateFileOnCorrect(ast, templateContent, !isScriptSetup, options);
 
 	if (errors.length === 0) {
 		return {

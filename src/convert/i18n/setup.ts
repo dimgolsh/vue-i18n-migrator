@@ -4,8 +4,9 @@ import { importsCheck } from '../imports';
 import { ParseResult } from '@babel/parser';
 import { processUseI18n } from '../use-i18n';
 import { wrapNewLineComment } from '../utils';
+import { ConvertOptions } from '../types';
 
-export const convertSetupI18n = (ast: ParseResult<t.File>, template: string): t.Statement[] => {
+export const convertSetupI18n = (ast: ParseResult<t.File>, template: string, options?: ConvertOptions): t.Statement[] => {
 	let setupContent: t.Statement[] = [];
 	const imports: t.ImportDeclaration[] = [];
 
@@ -13,7 +14,7 @@ export const convertSetupI18n = (ast: ParseResult<t.File>, template: string): t.
 	importsCheck(ast, imports);
 
 	// Process the define options - i.e. defineOptions({ i18n })
-	processDefineOptions(ast);
+	processDefineOptions(ast, template, options);
 
 	// Process the use-i18n - i.e. const { t } = useI18n()
 	processUseI18n(ast, setupContent, template);

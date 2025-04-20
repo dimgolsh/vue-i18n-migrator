@@ -5,6 +5,8 @@ import { checkI18nUsage } from './template';
 import { findExistingI18n } from './use-i18n';
 import { processBlockStatement } from './composition/blockStatement';
 import { convertDefineComponent } from './composition/defineComponent';
+import { processDefineOptions } from './setup/defineOptions';
+import { ConvertOptions } from './types';
 
 export const validateFile = (ast: ParseResult<t.File>, template: string) => {
 	const errors: string[] = [];
@@ -32,7 +34,12 @@ export const validateFile = (ast: ParseResult<t.File>, template: string) => {
 	return errors;
 };
 
-export const validateFileOnCorrect = (ast: ParseResult<t.File>, template: string, isComposition: boolean = false) => {
+export const validateFileOnCorrect = (
+	ast: ParseResult<t.File>,
+	template: string,
+	isComposition: boolean = false,
+	options?: ConvertOptions,
+) => {
 	const errors: string[] = [];
 
 	if (!hasI18nImport(ast)) {
@@ -51,7 +58,7 @@ export const validateFileOnCorrect = (ast: ParseResult<t.File>, template: string
 	}
 
 	if (isComposition) {
-		const defineComponentResult = convertDefineComponent(ast, false);
+		const defineComponentResult = convertDefineComponent(ast, template, false);
 
 		if (templateKeys.length) {
 			const isCorrect = templateKeys.every((name) =>
@@ -66,6 +73,12 @@ export const validateFileOnCorrect = (ast: ParseResult<t.File>, template: string
 		if (defineComponentResult) {
 			errors.push("⚠ Vue file don't should has i18n property in defineComponent");
 		}
+	} else {
+		const hasI18nInDefineOptions = processDefineOptions(ast, template, options);
+
+		if (hasI18nInDefineOptions) {
+			errors.push('⚠ Vue file should not has i18n property in defineOptions');
+		}
 	}
 
 	if (existingI18n) {
@@ -74,7 +87,7 @@ export const validateFileOnCorrect = (ast: ParseResult<t.File>, template: string
 		}
 
 		if (templateKeys.length) {
-			if (!templateKeys.every((arg) => existingI18n.argumentsNames.includes(arg))) {
+			if (!templateKeys.filter((key) => key !== 'i18nT').every((arg) => existingI18n.argumentsNames.includes(arg))) {
 				errors.push('⚠ useI18n(i18n) should has correct arguments');
 			}
 		}

@@ -5,22 +5,24 @@ interface I18nUsage {
 	tc: boolean;
 	n: boolean;
 	d: boolean;
+	i18nT: boolean;
 }
 
 export const checkI18nUsage = (template: string): I18nUsage => {
 	const { descriptor } = parse(`<template>${template}</template>`);
 
 	if (!descriptor.template) {
-		return { t: false, tc: false, n: false, d: false };
+		return { t: false, tc: false, n: false, d: false, i18nT: false };
 	}
 
 	const content = descriptor.template.content;
-	
+
 	return {
 		t: content.includes('$t('),
 		tc: content.includes('$tc('),
 		n: content.includes('$n('),
 		d: content.includes('$d('),
+		i18nT: content.includes('<i18n-t') || content.includes('<I18nT'),
 	};
 };
 

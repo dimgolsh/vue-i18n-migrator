@@ -3,6 +3,13 @@ import traverse from '@babel/traverse';
 import { NodePath } from '@babel/traverse';
 import { checkI18nUsage } from './template';
 
+interface IHasUseI18n {
+	has: boolean;
+	arguments: t.ObjectProperty[];
+	hasI18nMessage: boolean;
+	argumentsNames: string[];
+}
+
 //** Create an object property
 // i.e. { t }
 export const createShortandObjectProperty = (key: string) => {
@@ -15,16 +22,24 @@ export const createCallI18n = () => {
 	return t.callExpression(t.identifier('useI18n'), [t.identifier('i18n')]);
 };
 
+//** Create an empty i18n call expression
+// i.e. useI18n()
+export const createEmptyI18nCall = () => {
+	return t.expressionStatement(createCallI18n());
+};
+
 //** Create an i18n call expression
 // i.e. const { t } = useI18n()
 export const createI18nCall = (args: t.ObjectProperty[]): t.VariableDeclaration => {
 	return t.variableDeclaration('const', [t.variableDeclarator(t.objectPattern([...args]), createCallI18n())]);
 };
 
-const isHasUseI18n = (
-	node: t.VariableDeclaration,
-): { has: boolean; arguments: t.ObjectProperty[]; hasI18nMessage: boolean; argumentsNames: string[] } => {
-	if (!t.isVariableDeclarator(node.declarations[0])) {
+const findUseI18n = (expression: t.Expression) => {
+	return t.isCallExpression(expression) && t.isIdentifier(expression.callee) && expression.callee.name === 'useI18n';
+};
+
+const isHasUseI18nVariable = (node: t.VariableDeclaration): IHasUseI18n => {
+	if (!t.isVariableDeclarator(node?.declarations[0])) {
 		return { has: false, arguments: [], hasI18nMessage: false, argumentsNames: [] };
 	}
 
@@ -34,23 +49,30 @@ const isHasUseI18n = (
 		return { has: false, arguments: [], hasI18nMessage: false, argumentsNames: [] };
 	}
 
-	if (
-		!t.isCallExpression(decl.init) ||
-		!t.isIdentifier(decl.init.callee) ||
-		!t.isObjectPattern(decl.id) ||
-		decl.init.callee.name !== 'useI18n'
-	) {
+	if (!findUseI18n(decl.init)) {
+		return { has: false, arguments: [], hasI18nMessage: false, argumentsNames: [] };
+	}
+
+	const init = decl.init as t.CallExpression;
+	const hasI18nMessage = init.arguments[0] && t.isIdentifier(init.arguments[0]) && init.arguments[0].name === 'i18n';
+	const id = decl.id as t.ObjectPattern;
+
+	const argumentsNames = id.properties
+		.filter((property) => t.isObjectProperty(property))
+		.map((property) => (property.key as t.Identifier).name);
+
+	return { has: true, arguments: id.properties as t.ObjectProperty[], hasI18nMessage, argumentsNames };
+};
+
+const isHasUseI18nExpression = (expression: t.Expression): IHasUseI18n => {
+	if (!t.isCallExpression(expression) || !t.isIdentifier(expression.callee) || expression.callee.name !== 'useI18n') {
 		return { has: false, arguments: [], hasI18nMessage: false, argumentsNames: [] };
 	}
 
 	const hasI18nMessage =
-		decl.init.arguments[0] && t.isIdentifier(decl.init.arguments[0]) && decl.init.arguments[0].name === 'i18n';
+		expression.arguments[0] && t.isIdentifier(expression.arguments[0]) && expression.arguments[0].name === 'i18n';
 
-	const argumentsNames = decl.id.properties
-		.filter((property) => t.isObjectProperty(property))
-		.map((property) => (property.key as t.Identifier).name);
-
-	return { has: true, arguments: decl.id.properties as t.ObjectProperty[], hasI18nMessage, argumentsNames };
+	return { has: true, arguments: [], hasI18nMessage, argumentsNames: [] };
 };
 
 //** Filter unique arguments
@@ -69,7 +91,7 @@ export const processExistingI18n = (ast: t.Node, args: t.ObjectProperty[], repla
 
 	traverse(ast, {
 		VariableDeclaration(path: NodePath<t.VariableDeclaration>) {
-			const isHasUseI18nResult = isHasUseI18n(path.node);
+			const isHasUseI18nResult = isHasUseI18nVariable(path.node);
 
 			if (!isHasUseI18nResult.has) {
 				return;
@@ -88,11 +110,32 @@ export const processExistingI18n = (ast: t.Node, args: t.ObjectProperty[], repla
 		},
 	});
 
+	if (hasI18n) {
+		return true;
+	}
+
+	traverse(ast, {
+		ExpressionStatement(path: NodePath<t.ExpressionStatement>) {
+			const isHasUseI18nResult = isHasUseI18nExpression(path.node.expression);
+
+			if (!isHasUseI18nResult.has) {
+				return;
+			}
+
+			if (replace) {
+				path.replaceWith(createI18nCall(filterUniqueArgs([...args, ...isHasUseI18nResult.arguments])));
+				path.skip();
+			}
+
+			hasI18n = true;
+		},
+	});
+
 	return hasI18n;
 };
 
 export const processUseI18n = (ast: t.Node, statements: t.Statement[], template: string) => {
-	const { t, tc, n, d } = checkI18nUsage(template);
+	const { t, tc, n, d, i18nT } = checkI18nUsage(template);
 
 	const args: t.ObjectProperty[] = [];
 
@@ -121,6 +164,14 @@ export const processUseI18n = (ast: t.Node, statements: t.Statement[], template:
 			args,
 			useI18nCall,
 		};
+	} else if (!hasI18n && i18nT) {
+		const useI18nCall = createEmptyI18nCall();
+		statements.push(createEmptyI18nCall());
+
+		return {
+			args,
+			useI18nCall,
+		};
 	}
 
 	return {
@@ -131,12 +182,27 @@ export const processUseI18n = (ast: t.Node, statements: t.Statement[], template:
 //** Process existing i18n
 // i.e. const { t } = useI18n()
 export const findExistingI18n = (ast: t.Node) => {
-	let hasI18n: { has: boolean; arguments: t.ObjectProperty[]; hasI18nMessage: boolean; argumentsNames: string[] } =
-		null;
+	let hasI18n: IHasUseI18n | null = null;
 
 	traverse(ast, {
 		VariableDeclaration(path: NodePath<t.VariableDeclaration>) {
-			const isHasUseI18nResult = isHasUseI18n(path.node);
+			const isHasUseI18nResult = isHasUseI18nVariable(path.node);
+
+			if (!isHasUseI18nResult.has) {
+				return;
+			}
+
+			hasI18n = isHasUseI18nResult;
+		},
+	});
+
+	if (hasI18n) {
+		return hasI18n;
+	}
+
+	traverse(ast, {
+		ExpressionStatement(path: NodePath<t.ExpressionStatement>) {
+			const isHasUseI18nResult = isHasUseI18nExpression(path.node.expression);
 
 			if (!isHasUseI18nResult.has) {
 				return;

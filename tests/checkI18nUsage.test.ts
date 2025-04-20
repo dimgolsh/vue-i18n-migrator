@@ -59,4 +59,14 @@ describe('i18n usage detection', () => {
 		expect(usage.n).toBe(false);
 		expect(usage.d).toBe(false);
 	});
+
+	it('should detect i18n-t usage', () => {
+		const template = `
+			<template>
+				<i18n-t keypath="hello">Hello</i18n-t>
+			</template>
+		`;
+		const usage = checkI18nUsage(template);
+		expect(usage.i18nT).toBe(true);
+	});
 });

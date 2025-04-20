@@ -9,7 +9,10 @@ export enum BlockOrder {
 	TemplateSetupStyle = 'TemplateSetupStyle',
 }
 
-export interface ConvertOptions {}
+export interface ConvertOptions {
+	// Temporary support for legacy i18n-t usage
+	legacy: boolean;
+}
 
 export interface ConvertFileOptions extends ConvertOptions {
 	view: boolean;

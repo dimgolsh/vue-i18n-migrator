@@ -68,12 +68,41 @@ Try it out at [Demo](https://dimgolsh.github.io/vue-i18n-migrator/)
 npm i vue-i18n-migrator
 ```
 
-#### Convert a Single File
+#### API
+
+The CLI provides several commands for different use cases:
+
+##### Convert Commands
 
 ```bash
-# convert single vue file
+# Convert a single file
 npx vue-i18n-migrator single [options] <vue file path>
+
+# Convert all files in a directory
+npx vue-i18n-migrator folder <folder path>
+
+# Example:
+npx vue-i18n-migrator folder "src/components/users/"
 ```
+
+##### Check Commands
+
+```bash
+# Check a single file for deprecated i18n usage
+npx vue-i18n-migrator check-vue-i18n <vue file path>
+
+# Check all files in a directory for deprecated i18n usage
+npx vue-i18n-migrator check-vue-i18n-folder <folder path>
+
+# Examples:
+npx vue-i18n-migrator check-vue-i18n "src/components/users/UserProfile.vue"
+npx vue-i18n-migrator check-vue-i18n-folder "src/components/users/"
+```
+
+The check commands will output warnings if they find:
+- Deprecated i18n syntax in templates ($t, $tc, $n, $d)
+- Missing useI18n() calls in components
+- Incorrect i18n implementation
 
 #### Options
 ```
@@ -84,13 +113,6 @@ npx vue-i18n-migrator single [options] <vue file path>
 Example:
 ```bash
 npx vue-i18n-migrator single "src/components/HelloWorld.vue"
-```
-
-#### Convert All Files in a Directory
-
-```bash
-# convert folder
-npx vue-i18n-migrator folder <folder dir path>
 ```
 
 ## How It Works
