@@ -19,7 +19,7 @@ export const convertSingleFile = async (filepath: string, options: ConvertFileOp
 		}
 		const { view = false } = options ?? {};
 		const fileContent = await readFile(filepath);
-		const { isOk, content, errors } = await convert(fileContent); // Конвертация
+		const { isOk, content, errors } = await convert(fileContent, options); // Конвертация
 
 		if (isOk) {
 			if (view) {

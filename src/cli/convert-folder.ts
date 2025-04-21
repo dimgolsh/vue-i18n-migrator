@@ -5,9 +5,9 @@ import { convert } from '../convert';
 import { formatCode } from './format-code';
 import { ConvertFileOptions } from '../convert/types';
 
-const convertFile = async (filePath: string) => {
+const convertFile = async (filePath: string, options: ConvertFileOptions) => {
 	const fileContent = await readFile(filePath);
-	return convert(fileContent);
+	return convert(fileContent, options);
 };
 
 export const convertFolder = async (folderPath: string, options: ConvertFileOptions) => {
@@ -30,7 +30,7 @@ export const convertFolder = async (folderPath: string, options: ConvertFileOpti
 		for (const filePath of files) {
 			value++;
 			try {
-				const result = await convertFile(filePath);
+				const result = await convertFile(filePath, options);
 
 				if (result.isOk) {
 					resultAll.success++;
