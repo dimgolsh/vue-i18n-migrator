@@ -194,7 +194,7 @@ const { t } = useI18n(i18n);
 </template>
 `;
 
-			const result = await convert(input);
+			const result = await convert(input, { legacy: true });
 			expect(result.isOk).toBe(true);
 
 			const comparison = await compareCode(expected, result.content);

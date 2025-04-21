@@ -2,8 +2,9 @@ import { existsFileSync, findInDir, getFullPath, isVueFile, readFile } from '../
 import chalk from 'chalk';
 import { checkVueI18nFromContent } from '../convert/utils/checkVueI18n';
 import cliProgress from 'cli-progress';
+import { ConvertFileOptions } from 'src/convert/types';
 
-export const checkVueI18nFile = async (filepath: string) => {
+export const checkVueI18nFile = async (filepath: string, options: ConvertFileOptions) => {
 	try {
 		if (!isVueFile(filepath)) {
 			return true;
@@ -18,10 +19,14 @@ export const checkVueI18nFile = async (filepath: string) => {
 
 		const fileContent = await readFile(filepath);
 
-		const result = await checkVueI18nFromContent(fileContent);
+		const result = await checkVueI18nFromContent(fileContent, options);
 
 		if (!result.isOk) {
-			console.log(chalk.red(`✖ File is not correct syntax for Vue I18n: ${filepath}\n${result.errors.join('\n')}\n--------------------------------`));
+			console.log(
+				chalk.red(
+					`✖ File is not correct syntax for Vue I18n: ${filepath}\n${result.errors.join('\n')}\n--------------------------------`,
+				),
+			);
 			return false;
 		} else {
 			console.log(chalk.green(`✅ File is correct syntax for Vue I18n: ${filepath}`));
@@ -34,8 +39,8 @@ export const checkVueI18nFile = async (filepath: string) => {
 	}
 };
 
-export const checkVueI18nForFiles = async (filepaths: string[]) => {
-	const results = await Promise.all(filepaths.map((filepath) => checkVueI18nFile(filepath)));
+export const checkVueI18nForFiles = async (filepaths: string[], options?: ConvertFileOptions) => {
+	const results = await Promise.all(filepaths.map((filepath) => checkVueI18nFile(filepath, options)));
 
 	if (results.some((result) => !result)) {
 		console.log(chalk.red(`✖ Some files are not correct syntax for Vue I18n`));
@@ -46,8 +51,7 @@ export const checkVueI18nForFiles = async (filepaths: string[]) => {
 	return true;
 };
 
-
-export const checkVueI18nFolder = async (folderPath: string) => {
+export const checkVueI18nFolder = async (folderPath: string, options?: ConvertFileOptions) => {
 	try {
 		const start = performance.now();
 		const files = findInDir(folderPath);
@@ -62,13 +66,12 @@ export const checkVueI18nFolder = async (folderPath: string) => {
 		bar.start(files.length, 0);
 		const resultAll = { success: 0, err: 0 };
 		const errors: string[] = [];
-	
 
 		for (const filePath of files) {
 			value++;
 			try {
 				const fileContent = await readFile(filePath);
-				const result = await checkVueI18nFromContent(fileContent);
+				const result = await checkVueI18nFromContent(fileContent, options);
 
 				if (result.isOk) {
 					resultAll.success++;

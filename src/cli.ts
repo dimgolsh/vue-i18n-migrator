@@ -18,6 +18,7 @@ program
 	.command('single <filepath>')
 	.description('Convert a single Vue file to new i18n syntax')
 	.option('-v, --view', 'Preview changes in the editor')
+	.option('-l, --legacy', 'Supportlegacy i18n syntax')
 	.action((filepath: string, options: ConvertFileOptions) => {
 		convertSingleFile(filepath, options);
 	});
@@ -26,6 +27,7 @@ program
 	.command('folder <filePath>')
 	.description('Convert folder vue files to new i18n syntax')
 	.option('-v, --view', 'Preview changes in the editor')
+	.option('-l, --legacy', 'Supportlegacy i18n syntax')
 	.action((filepath: string, options: ConvertFileOptions) => {
 		convertFolder(filepath, options);
 	});
@@ -33,15 +35,17 @@ program
 program
 	.command('check-vue-i18n <filepath>')
 	.description('Check if the file is using the Vue i18n')
-	.action((filepath: string) => {
-		checkVueI18nFile(filepath);
+	.option('-l, --legacy', 'Supportlegacy i18n syntax')
+	.action((filepath: string, options: ConvertFileOptions) => {
+		checkVueI18nFile(filepath, options);
 	});
 
 program
 	.command('check-vue-i18n-folder <folderpath>')
 	.description('Check if the folder is using the Vue i18n')
-	.action((folderpath: string) => {
-		checkVueI18nFolder(folderpath);
+	.option('-l, --legacy', 'Supportlegacy i18n syntax')
+	.action((folderpath: string, options: ConvertFileOptions) => {
+		checkVueI18nFolder(folderpath, options);
 	});
 
 program.parse(process.argv);

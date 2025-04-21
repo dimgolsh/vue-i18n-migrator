@@ -58,7 +58,7 @@ export const validateFileOnCorrect = (
 	}
 
 	if (isComposition) {
-		const defineComponentResult = convertDefineComponent(ast, template, false);
+		const defineComponentResult = convertDefineComponent(ast, template, false, options);
 
 		if (templateKeys.length) {
 			const isCorrect = templateKeys.every((name) =>

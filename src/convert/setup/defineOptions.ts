@@ -1,19 +1,18 @@
 import * as t from '@babel/types';
 import traverse from '@babel/traverse';
-import { checkI18nUsage } from '../template';
 import { ConvertOptions } from '../types';
 
 //** Process defineOptions to remove i18n property
 // If defineOptions has only name property after i18n removal, keep it
 // If defineOptions has i18n property and no name property, remove defineOptions completely
-export const processDefineOptions = (ast: t.Node, template: string, options?: ConvertOptions) => {
-	const { legacy = true } = options || {};
+export const processDefineOptions = (ast: t.Node, _template: string, options?: ConvertOptions) => {
+	const { legacy = false } = options || {};
 
 	let hasI18nInDefineOptions = false;
-	const { i18nT } = checkI18nUsage(template);
+
 
 	// Temporary support for legacy i18n usage
-	if (i18nT && legacy) {
+	if (legacy) {
 		return false;
 	}
 

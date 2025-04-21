@@ -52,7 +52,7 @@ describe('checkVueI18nFromContent', () => {
 </template>
 `;
 
-		const result = await checkVueI18nFromContent(content);
+		const result = await checkVueI18nFromContent(content, { legacy: true });
 
 		expect(result.errors).toEqual([]);
 		expect(result.isOk).toBe(true);
@@ -72,7 +72,7 @@ describe('checkVueI18nFromContent', () => {
 </template>
 `;
 
-		const result = await checkVueI18nFromContent(content);
+		const result = await checkVueI18nFromContent(content, { legacy: true });
 
 		expect(result.errors).toEqual(['⚠ Vue file should has useI18n(i18n)']);
 		expect(result.isOk).toBe(false);

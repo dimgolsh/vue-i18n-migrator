@@ -4,9 +4,10 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { convert } from './convert';
 // @ts-ignore
 import defaultCode from './demo.txt?raw';
+import { ConvertOptions } from './convert/types';
 
-const convertWithCurrentConverter = async (code: string) => {
-	return convert(code);
+const convertWithCurrentConverter = async (code: string, options: ConvertOptions) => {
+	return convert(code, options);
 };
 
 // Compress and save code to URL
@@ -67,6 +68,10 @@ const createResetButton = (editor: monaco.editor.IStandaloneCodeEditor) => {
 const init = async () => {
 	const initialCode = getCodeFromURL();
 
+	const options: ConvertOptions = {
+		legacy: true,
+	};
+
 	const editor = monaco.editor.create(document.getElementById('editor')!, {
 		value: initialCode,
 		language: 'html',
@@ -78,7 +83,7 @@ const init = async () => {
 
 	createResetButton(editor);
 
-	const val = await convertWithCurrentConverter(initialCode);
+	const val = await convertWithCurrentConverter(initialCode, options);
 
 	const output = monaco.editor.create(document.getElementById('output'), {
 		value: val.content,
@@ -91,7 +96,7 @@ const init = async () => {
 			const currentCode = editor.getValue();
 			saveToURL(currentCode);
 
-			const val = await convertWithCurrentConverter(currentCode);
+			const val = await convertWithCurrentConverter(currentCode, options);
 			if (val.isOk) {
 				output.setValue(val.content as string);
 			} else {
@@ -102,12 +107,20 @@ const init = async () => {
 		}
 	};
 
+	const legacyCheckbox = document.getElementById('legacy') as HTMLInputElement;
+	legacyCheckbox.checked = options.legacy;
+
 	editor.onDidChangeModelContent(() => {
 		setOutput()
 			.then((res) => res)
 			.catch(() => {
 				console.error('Error');
 			});
+	});
+
+	legacyCheckbox.addEventListener('change', (e) => {
+		options.legacy = (e.target as HTMLInputElement).checked;
+		setOutput();
 	});
 };
 

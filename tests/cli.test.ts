@@ -79,11 +79,43 @@ defineOptions({ name: 'DateComponent', i18n });
 	);
 
 	const { stdout } = await execa('./dist/cli.js', ['check-vue-i18n', filePath], {
-		reject: false
+		reject: false,
 	});
 
 	expect(stdout).toContain('⚠ Vue file template contain deprecated i18n usage');
 	expect(stdout).toContain('⚠ Vue file should has useI18n(i18n)');
+	expect(stdout).toContain('⚠ Vue file should not has i18n property in defineOptions');
+});
+
+test('Test rejects checkVueI18nFromContent with legacy', async () => {
+	const filePath = path.resolve(__dirname, 'test.vue');
+
+	await fs.writeFile(
+		filePath,
+		`
+<script setup lang="ts">
+import i18n from './i18n';
+defineOptions({ name: 'DateComponent', i18n });
+</script>
+
+<template>
+  <div>
+    <p>{{ $t('date') }}</p>
+    <p>{{ $d(date, 'long') }}</p>
+    <p>{{ $tc('items', count) }}</p>
+  </div>
+</template>
+  `,
+		'utf-8',
+	);
+
+	const { stdout } = await execa('./dist/cli.js', ['check-vue-i18n', filePath, '--legacy'], {
+		reject: false,
+	});
+
+	expect(stdout).toContain('⚠ Vue file template contain deprecated i18n usage');
+	expect(stdout).toContain('⚠ Vue file should has useI18n(i18n)');
+	expect(stdout).not.toContain('⚠ Vue file should not has i18n property in defineOptions');
 });
 
 test('Test check-vue-i18n', async () => {
