@@ -35,7 +35,7 @@ export const transformTemplate = (template: string): string => {
 
 	const content = descriptor.template.content
 		// Transform interpolation i18n calls to composition calls
-		.replace(/\{\{\s*\$([tdn]|tc)\((.*?)\)\s*\}\}/g, (_, func, args) => {
+		.replace(/\{\{\s*\$([tdn]|tc)\(([\s\S]*?)\)\s*\}\}/g, (_, func, args) => {
 			// Convert $tc to t
 			if (func === 'tc') return `{{ t(${args}) }}`;
 			return `{{ ${func}(${args}) }}`;
