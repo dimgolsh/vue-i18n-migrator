@@ -24,6 +24,8 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 		const isScriptSetup = !!desc.scriptSetup;
 		const scriptContent = isScriptSetup ? desc.scriptSetup.content : desc.script.content;
 		const templateContent = desc.template?.content;
+		const hasAdditionalScript = isScriptSetup && desc?.script?.content;
+		const additionalScriptContent = hasAdditionalScript ? desc.script.content : '';
 
 		const ast = parse(scriptContent, {
 			sourceType: 'module',
@@ -40,7 +42,9 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 			};
 		}
 
-		const body = isScriptSetup ? convertSetupI18n(ast, templateContent, options) : convertCompositionI18n(ast, templateContent, options);
+		const body = isScriptSetup
+			? convertSetupI18n(ast, templateContent, options)
+			: convertCompositionI18n(ast, templateContent, options);
 
 		// Create a new AST with the converted code
 		const newAst = t.program(body);
@@ -56,6 +60,7 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 			code,
 			isScriptSetup ? BlockOrder.SetupTemplateStyle : BlockOrder.TemplateSetupStyle,
 			isScriptSetup,
+			additionalScriptContent,
 		);
 
 		// Format the code
