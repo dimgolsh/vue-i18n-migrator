@@ -107,12 +107,14 @@ The check commands will output warnings if they find:
 #### Options
 ```
 -v, --view             Preview changes in the editor
+-l, --legacy          Enable legacy mode for components that still need i18n instance
 -h, --help             Help for vue-i18n-migrator
 ```
 
 Example:
 ```bash
-npx vue-i18n-migrator single "src/components/HelloWorld.vue"
+# Convert with legacy mode enabled
+npx vue-i18n-migrator single --legacy "src/components/HelloWorld.vue"
 ```
 
 ## How It Works
@@ -149,3 +151,41 @@ The tool performs the following steps:
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 This README provides a comprehensive overview of your project, explaining how to install, use, and understand its functionality. You can customize the repository link and other specifics as needed.
+
+### Legacy Mode
+
+Legacy mode is designed for gradual migration scenarios where you need to maintain compatibility with components that still require the i18n instance. When enabled:
+
+- Preserves the i18n instance in component options
+- Keeps the i18n import statement
+- Still converts template syntax to composition API style
+- Adds useI18n with the i18n instance
+
+Example of legacy mode conversion:
+
+```vue
+<!-- Before -->
+<script setup lang="ts">
+import i18n from './i18n';
+defineOptions({ name: 'MyComponent', i18n });
+</script>
+<template>
+  <div>{{ $t('hello') }}</div>
+</template>
+
+<!-- After (with --legacy flag) -->
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import i18n from './i18n';
+
+defineOptions({
+  name: 'MyComponent',
+  i18n
+});
+
+const { t } = useI18n(i18n);
+</script>
+<template>
+  <div>{{ t('hello') }}</div>
+</template>
+```
