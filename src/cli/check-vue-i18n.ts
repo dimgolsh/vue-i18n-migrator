@@ -2,7 +2,7 @@ import { existsFileSync, findInDir, getFullPath, isVueFile, readFile } from '../
 import chalk from 'chalk';
 import { checkVueI18nFromContent } from '../convert/utils/checkVueI18n';
 import cliProgress from 'cli-progress';
-import { ConvertFileOptions } from 'src/convert/types';
+import { ConvertFileOptions } from '../convert/types';
 
 export const checkVueI18nFile = async (filepath: string, options: ConvertFileOptions) => {
 	try {
