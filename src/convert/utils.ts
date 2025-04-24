@@ -1,15 +1,19 @@
 import * as t from '@babel/types';
-import { parse as parseVue } from '@vue/compiler-sfc';
+import { parse as parseVue, SFCDescriptor } from '@vue/compiler-sfc';
 import { NodePath } from '@babel/traverse';
 
 export const newLine = 'REPLACE_FOR_NEW_LINE';
 
-export const parseVueFromContent = (content: string) => {
+export const parseVueFromContent = (
+	content: string,
+): { isOk: boolean; descriptor: SFCDescriptor; errors: string[] } => {
 	const { descriptor, errors } = parseVue(content);
+
 	if (errors.length > 0) {
-		throw new Error(errors.join('\n'));
+		return { isOk: false, descriptor: null, errors: errors.map((error) => error?.message) };
 	}
-	return descriptor;
+
+	return { isOk: true, descriptor, errors: [] };
 };
 
 export const isSFC = (content: string) => {

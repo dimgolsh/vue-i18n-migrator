@@ -6,23 +6,37 @@ interface I18nUsage {
 	n: boolean;
 	d: boolean;
 	i18nT: boolean;
+	templateKeys: string[];
 }
 
 export const checkI18nUsage = (template: string): I18nUsage => {
+	if (!template) {
+		return { t: false, tc: false, n: false, d: false, i18nT: false, templateKeys: [] };
+	}
+
 	const { descriptor } = parse(`<template>${template}</template>`);
 
 	if (!descriptor.template) {
-		return { t: false, tc: false, n: false, d: false, i18nT: false };
+		return { t: false, tc: false, n: false, d: false, i18nT: false, templateKeys: [] };
 	}
 
 	const content = descriptor.template.content;
 
-	return {
+	const result = {
 		t: content.includes('$t('),
 		tc: content.includes('$tc('),
 		n: content.includes('$n('),
 		d: content.includes('$d('),
 		i18nT: content.includes('<i18n-t') || content.includes('<I18nT'),
+	};
+
+	const templateKeys = Object.entries(result)
+		.filter(([_key, value]) => value)
+		.map(([key]) => key);
+
+	return {
+		...result,
+		templateKeys,
 	};
 };
 

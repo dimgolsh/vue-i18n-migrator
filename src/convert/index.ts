@@ -5,15 +5,38 @@ import { parseVueFromContent } from './utils';
 import { generateVue } from './generateVue';
 import { formatCode } from './formatCode';
 import { convertSetupI18n } from './i18n/setup';
-import { BlockOrder, ConvertResult, ConvertOptions } from './types';
+import { BlockOrder, ConvertResult, ConvertOptions, ConvertError } from './types';
 import { convertCompositionI18n } from './i18n/composition';
 import { validateFileOnCorrect } from './validateFile';
+import { checkI18nUsage } from './template';
 
 export const convert = async (content: string, options?: ConvertOptions): Promise<ConvertResult> => {
 	try {
 		const desc = parseVueFromContent(content);
 
-		if (!desc.script && !desc.scriptSetup) {
+		if (!desc.isOk) {
+			return {
+				isOk: false,
+				content: '',
+				errors: desc.errors,
+			};
+		}
+
+		const { descriptor } = desc;
+		const templateContent = descriptor?.template?.content;
+		const i18nUsage = checkI18nUsage(templateContent);
+
+		// skip if no script and no script setup and no i18n usage in template
+		if (!descriptor.script && !descriptor.scriptSetup && i18nUsage.templateKeys.length === 0) {
+			return {
+				isOk: false,
+				content: '',
+				errors: [ConvertError.AlreadyConverted],
+			};
+		}
+
+		// error if no script and no script setup and i18n usage in template
+		if (!descriptor.script && !descriptor.scriptSetup && i18nUsage.templateKeys.length > 0) {
 			return {
 				isOk: false,
 				content: '',
@@ -21,11 +44,11 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 			};
 		}
 
-		const isScriptSetup = !!desc.scriptSetup;
-		const scriptContent = isScriptSetup ? desc.scriptSetup.content : desc.script.content;
-		const templateContent = desc.template?.content;
-		const hasAdditionalScript = isScriptSetup && desc?.script?.content;
-		const additionalScriptContent = hasAdditionalScript ? desc.script.content : '';
+		const isScriptSetup = !!descriptor.scriptSetup;
+		const scriptContent = isScriptSetup ? descriptor.scriptSetup.content : descriptor.script.content;
+
+		const hasAdditionalScript = isScriptSetup && descriptor?.script?.content;
+		const additionalScriptContent = hasAdditionalScript ? descriptor.script.content : '';
 
 		const ast = parse(scriptContent, {
 			sourceType: 'module',
@@ -38,7 +61,7 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 			return {
 				isOk: false,
 				content: `// ⚠ Vue file is already converted \n\n ${content}`,
-				errors: ['⚠ Vue file is already converted'],
+				errors: [ConvertError.AlreadyConverted],
 			};
 		}
 
@@ -56,7 +79,7 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 
 		// Generate the Vue code
 		const rawVue = generateVue(
-			desc,
+			descriptor,
 			code,
 			isScriptSetup ? BlockOrder.SetupTemplateStyle : BlockOrder.TemplateSetupStyle,
 			isScriptSetup,

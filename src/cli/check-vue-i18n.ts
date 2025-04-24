@@ -28,8 +28,6 @@ export const checkVueI18nFile = async (filepath: string, options: ConvertFileOpt
 				),
 			);
 			return false;
-		} else {
-			console.log(chalk.green(`✅ File is correct syntax for Vue I18n: ${filepath}`));
 		}
 
 		return true;

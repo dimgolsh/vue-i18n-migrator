@@ -77,4 +77,34 @@ describe('checkVueI18nFromContent', () => {
 		expect(result.errors).toEqual(['⚠ Vue file should has useI18n(i18n)']);
 		expect(result.isOk).toBe(false);
 	});
+
+	it('should skip if no script and no script setup and no i18n usage in template', async () => {
+		const content = `
+<template>
+	<div>
+		
+	</div>
+</template>
+`;
+
+		const result = await checkVueI18nFromContent(content, { legacy: true });
+
+		expect(result.isOk).toBe(true);
+		expect(result.errors).toEqual([]);
+	});
+
+	it('should error if no script and no script setup and has i18n usage in template', async () => {
+		const content = `
+<template>
+	<div>
+		<h1>{{ $t('hello') }}</h1>
+	</div>
+</template>
+`;
+
+		const result = await checkVueI18nFromContent(content, { legacy: true });
+
+		expect(result.isOk).toBe(false);
+		expect(result.errors).toEqual(['⚠ Vue file must contain either script or script setup']);
+	});
 });

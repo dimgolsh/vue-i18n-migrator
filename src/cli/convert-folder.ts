@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import cliProgress from 'cli-progress';
 import { convert } from '../convert';
 import { formatCode } from './format-code';
-import { ConvertFileOptions } from '../convert/types';
+import { ConvertError, ConvertFileOptions } from '../convert/types';
 
 const convertFile = async (filePath: string, options: ConvertFileOptions) => {
 	const fileContent = await readFile(filePath);
@@ -23,7 +23,7 @@ export const convertFolder = async (folderPath: string, options: ConvertFileOpti
 
 		const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 		bar.start(files.length, 0);
-		const resultAll = { success: 0, err: 0 };
+		const resultAll = { success: 0, err: 0, skip: 0 };
 		const errors: string[] = [];
 		const { view = false } = options ?? {};
 
@@ -41,10 +41,15 @@ export const convertFolder = async (folderPath: string, options: ConvertFileOpti
 						await writeFile(filePath, format);
 					}
 				} else {
-					resultAll.err++;
-					errors.push(`${filePath} - ${result.errors.join('\n')}`);
+					if (result.errors.includes(ConvertError.AlreadyConverted)) {
+						resultAll.skip++;
+					} else {
+						resultAll.err++;
+						errors.push(`${filePath} \n${result.errors.join('\n')}`);
+					}
 				}
 			} catch (e) {
+				console.error(chalk.red(`✖ Error converting file: ${filePath} - ${(e as Error)?.message}`));
 				resultAll.err++;
 			}
 			bar.update(value);
@@ -57,6 +62,10 @@ export const convertFolder = async (folderPath: string, options: ConvertFileOpti
 
 		if (resultAll.success) {
 			console.log(chalk.green(`✔ Successfully converted ${resultAll.success} files in ${rounded}s.`));
+		}
+
+		if (resultAll.skip) {
+			console.log(chalk.green(`✔ ${resultAll.skip} files were skipped`));
 		}
 
 		if (resultAll.err) {

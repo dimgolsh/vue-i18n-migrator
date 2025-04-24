@@ -299,9 +299,10 @@ defineOptions({ name: 'DateComponent', i18n });
 		name: 'InvitationTeam',
 		components: {},
 		setup() {
+			const { t } = useI18n(i18n);
 			const { accountId } = useUser();
 
-			const { t } = useI18n(i18n);
+
 
 			return {
 				accountId,
@@ -424,9 +425,10 @@ defineOptions({ name: 'DateComponent', i18n });
 		i18n,
 		components: {},
 		setup() {
+			const { t } = useI18n(i18n);
 			const { accountId } = useUser();
 
-			const { t } = useI18n(i18n);
+			
 
 			return {
 				accountId,

@@ -49,9 +49,7 @@ export const validateFileOnCorrect = (
 	const existingI18n = findExistingI18n(ast);
 	const i18nUsage = checkI18nUsage(template);
 	const processBlockStatementResult = processBlockStatement(ast, template, false);
-	const templateKeys = Object.entries(i18nUsage)
-		.filter(([_key, value]) => value)
-		.map(([key]) => key);
+	const templateKeys = i18nUsage.templateKeys;
 
 	if (i18nUsage.t || i18nUsage.tc || i18nUsage.n || i18nUsage.d) {
 		errors.push('⚠ Vue file template contain deprecated i18n usage');

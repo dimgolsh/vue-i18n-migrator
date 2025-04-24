@@ -53,6 +53,12 @@ const isHasUseI18nVariable = (node: t.VariableDeclaration): IHasUseI18n => {
 		return { has: false, arguments: [], hasI18nMessage: false, argumentsNames: [] };
 	}
 
+	// If the identifier is i18n, return false
+	// i.e. const i18n = useI18n()
+	if (t.isIdentifier(decl.id)) {
+		return { has: false, arguments: [], hasI18nMessage: false, argumentsNames: [] };
+	}
+
 	const init = decl.init as t.CallExpression;
 	const hasI18nMessage = init.arguments[0] && t.isIdentifier(init.arguments[0]) && init.arguments[0].name === 'i18n';
 	const id = decl.id as t.ObjectPattern;

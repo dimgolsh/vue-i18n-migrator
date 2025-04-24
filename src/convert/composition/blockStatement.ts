@@ -53,8 +53,8 @@ export const processBlockStatement = (ast: t.Node, template: string, replace: bo
 				if (resultUseI18n.useI18nCall) {
 					path.replaceWith(
 						t.blockStatement([
-							...body.map(wrapNewLineComment),
 							wrapNewLineComment(resultUseI18n.useI18nCall),
+							...body.map(wrapNewLineComment),
 							wrapNewLineComment(returnStatement),
 						]),
 					);
