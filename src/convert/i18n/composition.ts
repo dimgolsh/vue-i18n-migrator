@@ -5,6 +5,7 @@ import { convertDefineComponent } from '../composition/defineComponent';
 import { processBlockStatement } from '../composition/blockStatement';
 import { wrapNewLineComment } from '../utils';
 import { ConvertOptions } from '../types';
+import { setupCreate } from '../composition/setupCreate';
 
 export const convertCompositionI18n = (
 	ast: ParseResult<t.File>,
@@ -16,6 +17,9 @@ export const convertCompositionI18n = (
 
 	// Check if the import declaration is a useI18n import
 	importsCheck(ast, imports);
+
+	// Process the setupCreate
+	setupCreate(ast, template);
 
 	// Remove i18n from defineComponent
 	convertDefineComponent(ast, template, true, options);

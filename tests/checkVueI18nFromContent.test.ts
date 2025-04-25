@@ -107,4 +107,40 @@ describe('checkVueI18nFromContent', () => {
 		expect(result.isOk).toBe(false);
 		expect(result.errors).toEqual(['⚠ Vue file must contain either script or script setup']);
 	});
+
+	it('should error if no script', async () => {
+		const content = `
+<template>
+	<div class="invitation-team">
+		<ScText
+			color="mulberry-purple"
+			size="14"
+		>
+			{{ $t('ToTeamDescription') }}
+		</ScText>
+	</div>
+</template>
+
+<script lang="ts">
+	import { defineComponent, ref } from 'vue';
+	import i18n from './i18n';
+
+
+	export default defineComponent({
+		name: 'InvitationTeam',
+		i18n,
+		components: {},
+	});
+</script>
+`;
+
+		const result = await checkVueI18nFromContent(content, { legacy: true });
+
+		expect(result.isOk).toBe(false);
+		expect(result.errors).toEqual([
+			'⚠ Vue file template contain deprecated i18n usage',
+			'⚠ return object should has t, n or d property',
+			'⚠ Vue file should has useI18n(i18n)',
+		]);
+	});
 });
