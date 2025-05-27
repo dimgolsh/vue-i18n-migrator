@@ -60,7 +60,7 @@ export const convert = async (content: string, options?: ConvertOptions): Promis
 		if (errors.length === 0) {
 			return {
 				isOk: false,
-				content: `// ⚠ Vue file is already converted \n\n ${content}`,
+				content,
 				errors: [ConvertError.AlreadyConverted],
 			};
 		}

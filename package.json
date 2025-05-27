@@ -1,6 +1,6 @@
 {
   "name": "vue-i18n-migrator",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "author": "Dmitriy (https://github.com/dimgolsh)",
   "keywords": [
     "script setup",
@@ -40,7 +40,7 @@
     "cli-progress": "^3.12.0",
     "commander": "^12.1.0",
     "monaco-editor": "^0.51.0",
-    "prettier": "^3.5.3"
+    "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.6",
