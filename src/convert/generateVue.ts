@@ -16,7 +16,17 @@ export const generateVue = (
 	const rawCodeVue = `<script ${isSetup ? 'setup' : ''} lang="ts">${codeFormat}</script>`;
 	const additionalScript = additionalScriptContent ? `<script lang="ts">${additionalScriptContent}</script>` : '';
 
-	const styles = `${sfc.styles.map((style) => `<style ${style.attrs?.lang ? `lang="${style.attrs.lang}" ${style.scoped ? ' scoped' : ''}` : `${style.scoped ? 'scoped' : ''}`}>${style.content.trim()}</style>`).join('\n\t')}`;
+	const styles = `${sfc.styles.map((style) => {
+		const langAttr = style.attrs?.lang ? `lang="${style.attrs.lang}"` : '';
+		const scopedAttr = style.scoped ? 'scoped' : '';
+		const srcAttr = style.attrs?.src ? `src="${style.attrs.src}"` : '';
+		
+		if (srcAttr) {
+			return `<style ${langAttr} ${scopedAttr} ${srcAttr} />`;
+		}
+		
+		return `<style ${langAttr} ${scopedAttr}>${style.content.trim()}</style>`;
+	}).join('\n\t')}`;
 
 	const vue = additionalScriptContent ? `${rawCodeVue}\n\n${additionalScript}` : rawCodeVue;
 
